@@ -1,0 +1,2298 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Нарды: Паук — Коллекционное издание</title>
+  <style>
+    :root {
+      --bg-dark: #0c0907;
+      --bg-radial: radial-gradient(circle at 50% 35%, #261c14 0%, #120d09 65%, #070504 100%);
+      --wood-outer: linear-gradient(145deg, #4a3220, #24160c);
+      --wood-inner: linear-gradient(180deg, #332114 0%, #1d120a 100%);
+      --wood-board:
+        repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.08) 0px, rgba(0, 0, 0, 0.08) 2px, transparent 2px, transparent 9px),
+        radial-gradient(ellipse at center, #4b3321 0%, #342114 65%, #23150c 100%);
+      --gold: #d4af37;
+      --gold-light: #f3e5ab;
+      --gold-dark: #8a6d1c;
+      --ivory: radial-gradient(circle at 35% 30%, #f5e6c8 0%, #d9be8c 55%, #9c7f4e 100%);
+      --ebony: radial-gradient(circle at 35% 30%, #4d3524 0%, #27190f 55%, #120b06 100%);
+      --highlight-move: rgba(212, 175, 55, 0.6);
+      --highlight-source: rgba(74, 222, 128, 0.65);
+      --text-main: #efe4d2;
+      --text-muted: #b09d82;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background: var(--bg-radial);
+      color: var(--text-main);
+      font-family: 'Georgia', 'Times New Roman', serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+    }
+
+    /* Верхняя панель */
+    .top-bar {
+      width: 100%;
+      max-width: 1040px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      color: var(--gold-light);
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+    }
+
+    .brand svg {
+      width: 28px;
+      height: 28px;
+      fill: var(--gold);
+      filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.4));
+    }
+
+    .top-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      background: linear-gradient(180deg, #2d241b 0%, #1a140e 100%);
+      color: var(--gold-light);
+      border: 1px solid var(--gold-dark);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover:not(:disabled) {
+      border-color: var(--gold);
+      box-shadow: 0 0 12px rgba(212, 175, 55, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: linear-gradient(180deg, #8a6d1c 0%, #5c450d 100%);
+      color: #fff8e7;
+      border-color: var(--gold);
+      font-weight: bold;
+    }
+
+    /* Информационная панель игроков */
+    .hud {
+      width: 100%;
+      max-width: 1040px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 16px 12px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .player-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(15, 18, 22, 0.75);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      padding: 8px 14px;
+      border-radius: 10px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+      transition: all 0.3s ease;
+    }
+
+    .player-card.active {
+      border-color: var(--gold);
+      box-shadow: 0 0 18px rgba(212, 175, 55, 0.35);
+      background: rgba(30, 26, 18, 0.85);
+    }
+
+    .checker-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid var(--gold);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
+      flex-shrink: 0;
+    }
+
+    .checker-icon.white { background: var(--ivory); }
+    .checker-icon.black { background: var(--ebony); }
+
+    .player-info {
+      display: flex;
+      flex-direction: column;
+      font-size: 0.85rem;
+    }
+
+    .player-name {
+      font-weight: bold;
+      color: var(--gold-light);
+    }
+
+    .bear-off-count {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    .status-banner {
+      flex: 1;
+      text-align: center;
+      font-size: 1rem;
+      color: var(--gold-light);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+      min-width: 180px;
+    }
+
+    /* Игровой стол */
+    .board-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 1040px;
+      padding: 0 12px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .board-frame {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      max-height: 70vh;
+      background-color: #3a2617;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Cpath d='M0 6h30v24H6V12h18v12H12v-6h6' fill='none' stroke='%231b1008' stroke-width='2.2' stroke-opacity='0.55'/%3E%3C/svg%3E"),
+        var(--wood-outer);
+      background-repeat: repeat, no-repeat;
+      background-size: 26px 26px, cover;
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow:
+        0 25px 60px rgba(0, 0, 0, 0.85),
+        inset 0 2px 4px rgba(255, 230, 170, 0.2),
+        inset 0 -4px 10px rgba(0, 0, 0, 0.8);
+      border: 2px solid #4a2e19;
+      display: flex;
+      gap: 0;
+    }
+
+    /* Узор между рельсами и полями: цельный мотив расположен по центру каждой полосы. */
+    .ornament-gutter {
+      flex: 0 0 32px;
+      align-self: stretch;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 26 26'%3E%3Cpath d='M0 4h22v18H4V8h14v10H8v-6h6' fill='none' stroke='%231b1008' stroke-width='2.2' stroke-opacity='0.65'/%3E%3C/svg%3E"),
+        linear-gradient(90deg, #2b1b10, #49301d 50%, #2b1b10);
+      background-size: 26px 26px, cover;
+      background-position: center top, center;
+      background-repeat: repeat-y, no-repeat;
+      pointer-events: none;
+    }
+
+    /* Половины доски (левая и правая) */
+    .board-half {
+      flex: 1;
+      background: var(--wood-board);
+      border-radius: 8px;
+      box-shadow:
+        inset 0 0 28px rgba(0, 0, 0, 0.85),
+        0 0 0 2px #140b05;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Резной рисунок паутины с пауком в центре каждой половины */
+    .board-art {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.34;
+    }
+
+    .board-art svg {
+      width: 68%;
+      height: 68%;
+      filter: drop-shadow(0 0 4px rgba(12, 5, 2, 0.85)) drop-shadow(0 1px 0 rgba(255, 220, 170, 0.12));
+    }
+
+    /* Бар (перегородка посередине) */
+    .bar {
+      width: 44px;
+      background: var(--wood-inner);
+      border-radius: 6px;
+      box-shadow:
+        inset 0 0 12px rgba(0, 0, 0, 0.9),
+        0 0 8px rgba(0, 0, 0, 0.6);
+      border: 1px solid #3a2312;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 2px;
+      position: relative;
+    }
+
+    .bar-slot {
+      width: 100%;
+      height: 45%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    /* Ряды пунктов */
+    .row {
+      display: flex;
+      width: 100%;
+      height: 46%;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Гребёнка-подставка под шашки — единый SVG-бортик .carve-ledge (см. ниже).
+       Отдельный градиентный гребень здесь убран, чтобы не было двойной тёмной полосы. */
+
+    .point {
+      flex: 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .row.top .point {
+      justify-content: flex-start;
+      padding-top: 0;
+    }
+
+    .row.bottom .point {
+      justify-content: flex-end;
+      padding-bottom: 0;
+    }
+
+    /* Треугольники */
+    .point::before {
+      content: '';
+      position: absolute;
+      left: 4%;
+      right: 4%;
+      height: 92%;
+      z-index: 1;
+      pointer-events: none;
+      filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
+    }
+
+    .row.top .point::before {
+      top: 0;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+    }
+
+    .row.bottom .point::before {
+      bottom: 0;
+      clip-path: polygon(50% 0, 0 100%, 100% 100%);
+    }
+
+    .point.light::before {
+      background: linear-gradient(180deg, #e5cca0 0%, #bfa06b 100%);
+    }
+
+    .point.dark::before {
+      background: linear-gradient(180deg, #2b1a10 0%, #1a0f09 100%);
+      opacity: 0.85;
+    }
+
+    /* Только в теме Маркетри: убираем наложенный тёмный треугольник, оставляем только основной фон */
+    .board-half[data-theme="marquetry"] .point.light::before,
+    .board-half[data-theme="marquetry"] .point.dark::before {
+      background: none !important;
+      clip-path: none !important;
+      filter: none;
+    }
+
+    /* Подсветка доступных ходов */
+    .point.valid-target::after {
+      content: '';
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--highlight-move);
+      border: 2px solid var(--gold-light);
+      box-shadow: 0 0 14px var(--gold);
+      z-index: 5;
+      pointer-events: none;
+      animation: pulse 1.2s infinite ease-in-out;
+    }
+
+    .row.top .point.valid-target::after { bottom: 6px; }
+    .row.bottom .point.valid-target::after { top: 6px; }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(0.9); opacity: 0.8; }
+      50% { transform: scale(1.15); opacity: 1; }
+    }
+
+    /* Шашки */
+    .checker {
+      width: 78%;
+      max-width: 46px;
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      position: relative;
+      z-index: 3;
+      border: 2px solid var(--gold);
+      box-shadow:
+        0 4px 0 #1a0f08,
+        0 7px 10px rgba(0, 0, 0, 0.8),
+        inset 0 2px 4px rgba(255, 255, 255, 0.35),
+        inset 0 -3px 5px rgba(0, 0, 0, 0.5);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      margin-top: -5%;
+      margin-bottom: -5%;
+    }
+
+    .row.top .checker:first-of-type,
+    .row.bottom .checker:last-of-type {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    .checker.white {
+      background: var(--ivory);
+    }
+
+    .checker.black {
+      background: var(--ebony);
+    }
+
+    /* Токарная резьба с концентрическими кольцами на шашках */
+    .checker::after {
+      content: '';
+      position: absolute;
+      inset: 10%;
+      border-radius: 50%;
+      pointer-events: none;
+      background: repeating-radial-gradient(
+        circle at 50% 50%,
+        rgba(255, 255, 255, 0.22) 0px,
+        rgba(0, 0, 0, 0.45) 2px,
+        transparent 3.5px,
+        rgba(255, 255, 255, 0.16) 5px,
+        rgba(0, 0, 0, 0.35) 6.5px
+      );
+      box-shadow:
+        inset 0 2px 4px rgba(0, 0, 0, 0.6),
+        inset 0 -1px 2px rgba(255, 255, 255, 0.25);
+    }
+
+    .checker.white::after {
+      background: repeating-radial-gradient(
+        circle at 50% 50%,
+        rgba(255, 252, 240, 0.55) 0px,
+        rgba(120, 90, 45, 0.45) 2px,
+        rgba(235, 215, 175, 0.2) 3.5px,
+        rgba(255, 250, 235, 0.4) 5px,
+        rgba(110, 80, 35, 0.4) 6.5px
+      );
+    }
+
+    .checker.selected {
+      box-shadow: 0 0 16px 4px var(--highlight-source), 0 6px 12px rgba(0, 0, 0, 0.8);
+      transform: scale(1.08);
+      z-index: 6;
+    }
+
+    .checker.movable:hover {
+      transform: scale(1.05);
+      cursor: pointer;
+    }
+
+    /* Счетчик, если шашек на пункте больше 5 */
+    .stack-badge {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.75);
+      color: var(--gold-light);
+      font-size: 0.75rem;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 10px;
+      border: 1px solid var(--gold);
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    /* Зона выброса (Bear Off) */
+    .bear-off-zone {
+      width: 54px;
+      background: var(--wood-inner);
+      border-radius: 8px;
+      border: 1px solid #3a2312;
+      box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.85);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 8px 4px;
+    }
+
+    .bear-off-tray {
+      height: 46%;
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px dashed rgba(212, 175, 55, 0.25);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 4px;
+      gap: 2px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .bear-off-tray.valid-target {
+      border-color: var(--gold);
+      background: rgba(212, 175, 55, 0.2);
+      box-shadow: 0 0 14px rgba(212, 175, 55, 0.45);
+    }
+
+    .bear-off-chip {
+      width: 85%;
+      height: 7px;
+      border-radius: 3px;
+      border: 1px solid var(--gold-dark);
+    }
+    .bear-off-chip.white { background: #e8dec8; }
+    .bear-off-chip.black { background: #1d2026; }
+
+    /* Кубики */
+    .dice-area {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      gap: 14px;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    .die {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(145deg, #fffdf7, #d8ccb4);
+      border-radius: 8px;
+      border: 1.5px solid var(--gold-dark);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.75), inset 0 2px 4px #fff;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      padding: 6px;
+      gap: 2px;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .die.used {
+      opacity: 0.35;
+      transform: scale(0.88);
+    }
+
+    .die.rolling {
+      animation: rollDice 0.45s ease-out;
+    }
+
+    @keyframes rollDice {
+      0% { transform: rotate(0deg) scale(0.7); }
+      50% { transform: rotate(180deg) scale(1.2); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+
+    .pip {
+      width: 7px;
+      height: 7px;
+      background: #1a120b;
+      border-radius: 50%;
+      align-self: center;
+      justify-self: center;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8);
+    }
+
+    /* Нижняя панель действий */
+    .action-bar {
+      width: 100%;
+      max-width: 1040px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      padding: 14px 16px;
+      flex-wrap: wrap;
+    }
+
+    /* Анимированная летящая шашка */
+    .flying-checker {
+      position: fixed;
+      border-radius: 50%;
+      border: 2px solid var(--gold);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.85);
+      z-index: 100;
+      pointer-events: none;
+    }
+    .flying-checker.white { background: var(--ivory); }
+    .flying-checker.black { background: var(--ebony); }
+
+    /* Модальные окна (Меню, Правила, Победа) */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 6, 8, 0.85);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 16px;
+    }
+
+    .modal-overlay.hidden {
+      display: none;
+    }
+
+    .modal-card {
+      background: linear-gradient(160deg, #1f1914 0%, #100d0a 100%);
+      border: 2px solid var(--gold);
+      border-radius: 14px;
+      padding: 28px;
+      max-width: 460px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(212, 175, 55, 0.15);
+    }
+
+    .modal-card h1, .modal-card h2 {
+      color: var(--gold-light);
+      margin-top: 0;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-card p {
+      color: var(--text-muted);
+      line-height: 1.5;
+      font-size: 0.95rem;
+    }
+
+    .menu-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .menu-buttons .btn {
+      padding: 12px;
+      font-size: 1rem;
+    }
+
+    .rules-list {
+      text-align: left;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      padding-left: 18px;
+      margin: 14px 0;
+    }
+
+    /* Сетка выбора тем (Косметика) */
+    .theme-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .theme-card {
+      background: rgba(25, 18, 12, 0.9);
+      border: 1px solid var(--gold-dark);
+      border-radius: 10px;
+      padding: 10px;
+      cursor: pointer;
+      color: var(--text-main);
+      font-family: inherit;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .theme-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-1px);
+    }
+
+    .theme-card.active {
+      border-color: var(--gold-light);
+      box-shadow: 0 0 14px rgba(212, 175, 55, 0.45);
+      background: rgba(50, 36, 22, 0.95);
+    }
+
+    .theme-preview {
+      width: 100%;
+      height: 52px;
+      border-radius: 6px;
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .theme-preview svg {
+      width: 40px;
+      height: 40px;
+    }
+
+    /* Выбор коротких и длинных нард в том же коллекционном стиле */
+    .modal-card {
+      max-height: calc(100dvh - 32px);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #72552d #17110b;
+    }
+    .menu-card { max-width: 520px; }
+    .menu-card h1 { margin-bottom: 8px; font-size: 2rem; }
+    .menu-card > p { margin-top: 0; }
+    .variant-label {
+      display: block;
+      margin: 22px 0 10px;
+      text-align: left;
+      color: var(--text-muted);
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+    .variant-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .variant-option {
+      position: relative;
+      appearance: none;
+      min-width: 0;
+      padding: 15px 14px 14px;
+      border: 1px solid #59412a;
+      border-radius: 9px;
+      background: linear-gradient(145deg, #2d2117, #1b140e);
+      color: var(--text-main);
+      font-family: inherit;
+      text-align: left;
+      cursor: pointer;
+      box-shadow: inset 0 1px 0 #ffffff08, 0 5px 12px #0003;
+      transition: border-color .2s, background .2s, box-shadow .2s;
+    }
+    .variant-option:hover { border-color: #a8874b; background: linear-gradient(145deg, #38291b, #21180f); }
+    .variant-option.is-selected {
+      border-color: #d4af64;
+      background: linear-gradient(145deg, #48351f, #2b2015);
+      box-shadow: inset 0 0 20px #d4af3710, 0 0 0 1px #d4af3720;
+    }
+    button:focus-visible, .point:focus-visible, .bear-off-tray:focus-visible {
+      outline: 2px solid var(--gold-light);
+      outline-offset: 4px;
+    }
+    .variant-mini { width: 120px; max-width: 84%; height: 52px; display: block; margin: 0 0 12px; opacity: .75; }
+    .is-selected .variant-mini { opacity: 1; }
+    .variant-name { display: block; color: #ead5ad; font-size: 1rem; font-weight: bold; }
+    .variant-caption { display: block; color: #ac9679; font-size: .75rem; line-height: 1.4; margin-top: 6px; }
+    .variant-radio {
+      position: absolute; top: 13px; right: 12px;
+      width: 17px; height: 17px; border: 1px solid #846745; border-radius: 50%;
+      display: grid; place-items: center;
+    }
+    .variant-radio::after { content: ''; width: 7px; height: 7px; background: #ead5ad; border-radius: 50%; opacity: 0; }
+    .is-selected .variant-radio { border-color: #d4af64; }
+    .is-selected .variant-radio::after { opacity: 1; }
+    .variant-new {
+      position: absolute; top: 44px; right: 10px;
+      color: #c5a568; font-family: Arial, sans-serif;
+      font-size: .48rem; letter-spacing: .08em; text-transform: uppercase;
+      writing-mode: vertical-rl;
+    }
+    .modal-card .variant-description {
+      margin: 13px 0 0; min-height: 2.8em;
+      text-align: left; font-size: .8rem; line-height: 1.5; color: #bba387;
+    }
+    .menu-buttons { margin-top: 18px; gap: 10px; }
+    .btn-resume { border-color: #645039; color: #b8a68a; background: transparent; box-shadow: none; }
+    .turn-info { flex: 1; min-width: 170px; text-align: center; }
+    .game-variant {
+      display: block; margin-bottom: 6px; color: #b59862;
+      font-size: .64rem; text-transform: uppercase; letter-spacing: .14em;
+    }
+    .turn-info .status-banner { min-width: 0; }
+    .board-frame[data-variant="long"] .bar-slot { visibility: hidden; }
+    .bar::before,
+    .bar::after {
+      content: ''; position: absolute; left: -3px; right: -3px; height: 27px;
+      background: radial-gradient(circle at 18% 50%, #191008 0 2px, transparent 3px),
+                  radial-gradient(circle at 82% 50%, #191008 0 2px, transparent 3px),
+                  linear-gradient(90deg, #554021, #ab8e4c 44%, #493417 51%, #9b7a3a 60%, #574023);
+      border: 1px solid #352511; border-radius: 3px;
+      box-shadow: inset 0 1px 1px #e8d39b55, 0 3px 5px #0009;
+    }
+    .bar::before { top: 19%; }
+    .bar::after { bottom: 19%; }
+    .dice-area.is-double { gap: 7px; }
+    .dice-area.is-double .die { width: 36px; height: 36px; padding: 4px; }
+    [hidden] { display: none !important; }
+    @media (max-width: 440px) {
+      .menu-card { padding: 24px 18px; }
+      .variant-options { gap: 9px; }
+      .variant-option { padding: 12px 10px; }
+      .variant-name { font-size: .88rem; }
+      .variant-caption { font-size: .69rem; min-height: 2.8em; }
+      .variant-radio { top: 10px; right: 8px; width: 15px; height: 15px; }
+      .variant-new { right: 6px; }
+      .turn-info { order: 3; flex-basis: 100%; }
+      .game-variant { margin-bottom: 3px; }
+      .hud { gap: 9px; }
+      .action-bar { gap: 8px; }
+      .action-bar .btn { padding: 9px 11px; font-size: .8rem; }
+      .dice-area.is-double .die { width: 27px; height: 27px; padding: 3px; }
+      .dice-area.is-double .pip { width: 4px; height: 4px; }
+    }
+
+    /* Адаптивность для мобильных */
+    @media (max-width: 720px) {
+      .board-frame {
+        padding: 8px;
+        gap: 0;
+        aspect-ratio: 4 / 3;
+      }
+      .ornament-gutter { flex-basis: 6px; background-size: 6px 6px, cover; }
+      .bar { width: 28px; }
+      .bear-off-zone { width: 34px; }
+      .die { width: 32px; height: 32px; padding: 4px; }
+      .pip { width: 5px; height: 5px; }
+      .checker { width: 86%; }
+      .brand { font-size: 1rem; }
+      .hud { padding: 4px 10px 8px; }
+      .player-card { padding: 6px 10px; }
+    }
+
+    /* ===== Резные 3D-выемки ===== */
+    /* Диаметр шашки и геометрия её лунки используют одни и те же размеры.
+       syncCheckerSeats() подгоняет круглые вырезы при изменении ширины доски. */
+    .board-half {
+      --checker-width-ratio: 0.78;
+      --checker-seat-inset: 10px;
+      padding: 0;
+      min-width: 0;
+    }
+    .board-half .row { height: 46%; }
+    .board-half .point { min-width: 0; }
+    .board-half .point .checker {
+      width: var(--checker-diameter, 78%);
+      height: var(--checker-diameter, auto);
+      flex-shrink: 0;
+    }
+
+    /* Центр каждого полукруглого выреза точно совпадает с центром крайней шашки.
+       Субпиксельное перекрытие кромки убирает просвет от сглаживания. */
+    .carve-ledge {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: calc(var(--checker-seat-inset) + var(--checker-diameter, 46px) / 2);
+      z-index: 5;
+      pointer-events: none;
+      filter: drop-shadow(0 0.4px 0.45px rgba(0, 0, 0, 0.55));
+    }
+    .carve-ledge.top { top: 0; }
+    .carve-ledge.bottom { bottom: 0; transform: scaleY(-1); }
+    .carve-ledge svg { width: 100%; height: 100%; display: block; overflow: hidden; }
+    .carve-ledge svg path:nth-of-type(2) {
+      stroke: rgba(225, 193, 139, 0.5);
+      stroke-width: 0.8px;
+      stroke-linejoin: round;
+    }
+
+    .row.top .point { padding-top: var(--checker-seat-inset); }
+    .row.bottom .point { padding-bottom: var(--checker-seat-inset); }
+
+    /* Боковые рельсы с длинными выемками (как вырезано в раме) */
+    .side-rail,
+    .bear-off-zone {
+      width: 46px;
+      background:
+        repeating-linear-gradient(0deg, rgba(0,0,0,0.07) 0 2px, transparent 2px 8px),
+        linear-gradient(90deg, #3e2817, #573a22 50%, #3e2817);
+      border-radius: 10px;
+      border: 1px solid #2a190c;
+      box-shadow:
+        inset 0 1px 2px rgba(255, 225, 170, 0.25),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.6),
+        0 4px 10px rgba(0, 0, 0, 0.55);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 7px;
+      position: relative;
+    }
+
+    .groove,
+    .bear-off-tray {
+      width: 100%;
+      height: 42%;
+      border-radius: 999px;
+      background:
+        linear-gradient(90deg, #120a05 0%, #2b1a0e 30%, #3a2414 55%, #24160b 100%);
+      border: none;
+      box-shadow:
+        inset 6px 0 10px rgba(0, 0, 0, 0.9),
+        inset -3px 0 6px rgba(0, 0, 0, 0.6),
+        inset 0 10px 14px rgba(0, 0, 0, 0.85),
+        inset 0 -6px 8px rgba(0, 0, 0, 0.5),
+        0 1px 0 rgba(255, 220, 160, 0.28),
+        0 -1px 0 rgba(0, 0, 0, 0.6);
+    }
+
+    .bear-off-tray { padding: 14px 4px; }
+    .bear-off-tray.valid-target {
+      background: linear-gradient(90deg, #2a1d06, #5a4416 55%, #2a1d06);
+      box-shadow:
+        inset 6px 0 10px rgba(0, 0, 0, 0.8),
+        inset 0 10px 14px rgba(0, 0, 0, 0.7),
+        0 0 14px rgba(212, 175, 55, 0.55);
+    }
+
+    .rail-hole {
+      width: 22px;
+      height: 22px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: radial-gradient(circle at 60% 65%, #3a2414 0%, #150c06 70%);
+      box-shadow:
+        inset 3px 4px 6px rgba(0, 0, 0, 0.95),
+        0 1px 0 rgba(255, 220, 160, 0.3);
+    }
+
+    @media (max-width: 720px) {
+      .board-half {
+        --checker-width-ratio: 0.86;
+        --checker-seat-inset: 6px;
+      }
+      .side-rail, .bear-off-zone { width: 26px; padding: 6px 4px; }
+      .rail-hole { width: 12px; height: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Верхняя панель -->
+  <header class="top-bar">
+    <div class="brand">
+      <!-- Медальон Волка (SVG) -->
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M32 4L14 18l-8 14 10 12 4 14 12-6 12 6 4-14 10-12-8-14L32 4zm0 10l10 10-4 8h-12l-4-8 10-10zm-11 22l5 4-2 6-5-4 2-6zm22 0l2 6-5 4-2-6 5-4z"/>
+      </svg>
+      <span data-i18n="title">Ведьмак: Нарды</span>
+    </div>
+    <div class="top-controls">
+      <button class="btn" id="btn-cosmetics" data-i18n="cosmetics">Косметика</button>
+      <button class="btn" id="btn-menu" data-i18n="menu">Меню</button>
+      <button class="btn" id="btn-lang" aria-label="Переключить язык">EN</button>
+    </div>
+  </header>
+
+  <!-- Панель игроков -->
+  <section class="hud">
+    <div class="player-card" id="card-white">
+      <div class="checker-icon white"></div>
+      <div class="player-info">
+        <span class="player-name" id="name-white" data-i18n="whitePlayer">Белые (Игрок)</span>
+        <span class="bear-off-count"><span data-i18n="borneOff">Снято</span>: <strong id="off-white">0</strong>/15</span>
+      </div>
+    </div>
+
+    <div class="turn-info">
+      <span class="game-variant" id="game-variant-label">Короткие нарды</span>
+      <div class="status-banner" id="status-text" aria-live="polite">Выберите режим игры</div>
+    </div>
+
+    <div class="player-card" id="card-black">
+      <div class="checker-icon black"></div>
+      <div class="player-info">
+        <span class="player-name" id="name-black" data-i18n="blackPlayer">Черные (ИИ)</span>
+        <span class="bear-off-count"><span data-i18n="borneOff">Снято</span>: <strong id="off-black">0</strong>/15</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Игровая доска -->
+  <main class="board-wrapper">
+    <div class="board-frame" id="board-frame" data-variant="short">
+      <!-- Левый резной рельс с выемками -->
+      <div class="side-rail" aria-hidden="true">
+        <div class="groove"></div>
+        <div class="rail-hole"></div>
+        <div class="groove"></div>
+      </div>
+
+      <div class="ornament-gutter" aria-hidden="true"></div>
+
+      <!-- Левая половина -->
+      <div class="board-half">
+        <div class="carve-ledge top" aria-hidden="true">
+          <svg viewBox="0 0 600 40" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="lg-top-L" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#140b05"/>
+                <stop offset="0.55" stop-color="#2a190d"/>
+                <stop offset="1" stop-color="#3d2716"/>
+              </linearGradient>
+            </defs>
+            <path d="M0 0 H600 V40 H589 A39 34 0 0 0 511 40 H489 A39 34 0 0 0 411 40 H389 A39 34 0 0 0 311 40 H289 A39 34 0 0 0 211 40 H189 A39 34 0 0 0 111 40 H89 A39 34 0 0 0 11 40 H0 Z" fill="url(#lg-top-L)"/>
+            <path d="M600 40 H589 A39 34 0 0 0 511 40 H489 A39 34 0 0 0 411 40 H389 A39 34 0 0 0 311 40 H289 A39 34 0 0 0 211 40 H189 A39 34 0 0 0 111 40 H89 A39 34 0 0 0 11 40 H0" fill="none" stroke="rgba(255,220,160,0.45)" stroke-width="1.6" vector-effect="non-scaling-stroke"/>
+            <path d="M0 3 H600" stroke="rgba(0,0,0,0.6)" stroke-width="4" vector-effect="non-scaling-stroke"/>
+          </svg>
+        </div>
+        <div class="carve-ledge bottom" aria-hidden="true">
+          <svg viewBox="0 0 600 40" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="lg-bottom-L" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#140b05"/>
+                <stop offset="0.55" stop-color="#2a190d"/>
+                <stop offset="1" stop-color="#3d2716"/>
+              </linearGradient>
+            </defs>
+            <path d="M0 0 H600 V40 H589 A39 34 0 0 0 511 40 H489 A39 34 0 0 0 411 40 H389 A39 34 0 0 0 311 40 H289 A39 34 0 0 0 211 40 H189 A39 34 0 0 0 111 40 H89 A39 34 0 0 0 11 40 H0 Z" fill="url(#lg-bottom-L)"/>
+            <path d="M600 40 H589 A39 34 0 0 0 511 40 H489 A39 34 0 0 0 411 40 H389 A39 34 0 0 0 311 40 H289 A39 34 0 0 0 211 40 H189 A39 34 0 0 0 111 40 H89 A39 34 0 0 0 11 40 H0" fill="none" stroke="rgba(255,220,160,0.45)" stroke-width="1.6" vector-effect="non-scaling-stroke"/>
+            <path d="M0 3 H600" stroke="rgba(0,0,0,0.6)" stroke-width="4" vector-effect="non-scaling-stroke"/>
+          </svg>
+        </div>
+        <div class="board-art" aria-hidden="true">
+          <svg viewBox="0 0 200 200" fill="none" stroke="#e5cca0" stroke-width="1.6">
+            <path d="M100 10 L100 190 M10 100 L190 100 M36 36 L164 164 M164 36 L36 164"/>
+            <polygon points="100,25 153,47 175,100 153,153 100,175 47,153 25,100 47,47"/>
+            <polygon points="100,50 135,65 150,100 135,135 100,150 65,135 50,100 65,65"/>
+            <polygon points="100,74 118,82 126,100 118,118 100,126 82,118 74,100 82,82"/>
+            <!-- Паук -->
+            <ellipse cx="100" cy="108" rx="11" ry="15" fill="#e5cca0"/>
+            <circle cx="100" cy="88" r="7" fill="#e5cca0"/>
+            <path d="M93 88 Q75 72 68 85 M93 93 Q72 92 66 105 M93 98 Q74 112 72 126 M94 104 Q80 124 82 138" stroke-width="2.2"/>
+            <path d="M107 88 Q125 72 132 85 M107 93 Q128 92 134 105 M107 98 Q126 112 128 126 M106 104 Q120 124 118 138" stroke-width="2.2"/>
+          </svg>
+        </div>
+        <div class="row top" id="row-top-left"></div>
+        <div class="row bottom" id="row-bottom-left"></div>
+      </div>
+
+      <div class="ornament-gutter" aria-hidden="true"></div>
+
+      <!-- Бар -->
+      <div class="bar">
+        <div class="bar-slot" id="bar-black" title="Bar Black"></div>
+        <div class="bar-slot" id="bar-white" title="Bar White"></div>
+      </div>
+
+      <div class="ornament-gutter" aria-hidden="true"></div>
+
+      <!-- Правая половина -->
+      <div class="board-half">
+        <div class="carve-ledge top" aria-hidden="true">
+          <svg viewBox="0 0 600 40" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="lg-top-R" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#140b05"/>
+                <stop offset="0.55" stop-color="#2a190d"/>
+                <stop offset="1" stop-color="#3d2716"/>
+              </linearGradient>
+            </defs>
+            <path d="M0 0 H600 V40 H589 A39 34 0 0 0 511 40 H489 A39 34 0 0 0 411 40 H389 A39 34 0 0 0 311 40 H289 A39 34 0 0 0 211 40 H189 A39 34 0 0 0 111 40 H89 A39 34 0 0 0 11 40 H0 Z" fill="url(#lg-top-R)"/>
+            <path d="M600 40 H589 A39 34 0 0 0 511 40 H489 A39 34 0 0 0 411 40 H389 A39 34 0 0 0 311 40 H289 A39 34 0 0 0 211 40 H189 A39 34 0 0 0 111 40 H89 A39 34 0 0 0 11 40 H0" fill="none" stroke="rgba(255,220,160,0.45)" stroke-width="1.6" vector-effect="non-scaling-stroke"/>
+            <path d="M0 3 H600" stroke="rgba(0,0,0,0.6)" stroke-width="4" vector-effect="non-scaling-stroke"/>
+          </svg>
+        </div>
+        <div class="carve-ledge bottom" aria-hidden="true">
+          <svg viewBox="0 0 600 40" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="lg-bottom-R" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#140b05"/>
+                <stop offset="0.55" stop-color="#2a190d"/>
+                <stop offset="1" stop-color="#3d2716"/>
+              </linearGradient>
+            </defs>
+            <path d="M0 0 H600 V40 H589 A39 34 0 0 0 511 40 H489 A39 34 0 0 0 411 40 H389 A39 34 0 0 0 311 40 H289 A39 34 0 0 0 211 40 H189 A39 34 0 0 0 111 40 H89 A39 34 0 0 0 11 40 H0 Z" fill="url(#lg-bottom-R)"/>
+            <path d="M600 40 H589 A39 34 0 0 0 511 40 H489 A39 34 0 0 0 411 40 H389 A39 34 0 0 0 311 40 H289 A39 34 0 0 0 211 40 H189 A39 34 0 0 0 111 40 H89 A39 34 0 0 0 11 40 H0" fill="none" stroke="rgba(255,220,160,0.45)" stroke-width="1.6" vector-effect="non-scaling-stroke"/>
+            <path d="M0 3 H600" stroke="rgba(0,0,0,0.6)" stroke-width="4" vector-effect="non-scaling-stroke"/>
+          </svg>
+        </div>
+        <div class="board-art" aria-hidden="true">
+          <svg viewBox="0 0 200 200" fill="none" stroke="#e5cca0" stroke-width="1.6">
+            <path d="M100 10 L100 190 M10 100 L190 100 M36 36 L164 164 M164 36 L36 164"/>
+            <polygon points="100,25 153,47 175,100 153,153 100,175 47,153 25,100 47,47"/>
+            <polygon points="100,50 135,65 150,100 135,135 100,150 65,135 50,100 65,65"/>
+            <polygon points="100,74 118,82 126,100 118,118 100,126 82,118 74,100 82,82"/>
+            <!-- Паук -->
+            <ellipse cx="100" cy="108" rx="11" ry="15" fill="#e5cca0"/>
+            <circle cx="100" cy="88" r="7" fill="#e5cca0"/>
+            <path d="M93 88 Q75 72 68 85 M93 93 Q72 92 66 105 M93 98 Q74 112 72 126 M94 104 Q80 124 82 138" stroke-width="2.2"/>
+            <path d="M107 88 Q125 72 132 85 M107 93 Q128 92 134 105 M107 98 Q126 112 128 126 M106 104 Q120 124 118 138" stroke-width="2.2"/>
+          </svg>
+        </div>
+        <div class="row top" id="row-top-right"></div>
+        <div class="row bottom" id="row-bottom-right"></div>
+      </div>
+
+      <div class="ornament-gutter" aria-hidden="true"></div>
+
+      <!-- Зона выброса (Bear Off) -->
+      <div class="bear-off-zone">
+        <div class="bear-off-tray" id="tray-black" title="Bear off Black"></div>
+        <div class="rail-hole"></div>
+        <div class="bear-off-tray" id="tray-white" title="Bear off White"></div>
+      </div>
+
+      <!-- Кубики -->
+      <div class="dice-area" id="dice-area"></div>
+    </div>
+  </main>
+
+  <!-- Нижняя панель управления -->
+  <footer class="action-bar">
+    <button class="btn btn-primary" id="btn-roll" data-i18n="roll">Бросить кубики</button>
+    <button class="btn btn-primary" id="btn-end" data-i18n="endTurn" hidden>Завершить ход</button>
+    <button class="btn" id="btn-undo" disabled data-i18n="undo">Отменить ход</button>
+    <button class="btn" id="btn-new" data-i18n="newGame">Новая игра</button>
+  </footer>
+
+  <!-- Главное меню -->
+  <div class="modal-overlay" id="modal-menu" role="dialog" aria-modal="true" aria-labelledby="menu-title">
+    <div class="modal-card menu-card" style="position: relative;">
+      <button class="btn" id="btn-lang-menu" type="button" style="position: absolute; top: 16px; right: 16px;">EN</button>
+      <h1 id="menu-title" data-i18n="menuTitle">Нарды</h1>
+      <p data-i18n="menuSubtitle">Коллекционное издание в стиле Ведьмака</p>
+      <span class="variant-label" id="variant-label" data-i18n="variantLabel">Выберите вид игры</span>
+      <div class="variant-options" role="radiogroup" aria-labelledby="variant-label">
+        <button class="variant-option is-selected" type="button" role="radio" aria-checked="true" data-variant="short" tabindex="0" aria-describedby="variant-description">
+          <span class="variant-radio" aria-hidden="true"></span>
+          <svg class="variant-mini" viewBox="0 0 132 62" aria-hidden="true">
+            <rect x="1" y="1" width="130" height="60" rx="5" fill="#24170e" stroke="#987347"/>
+            <path d="M7 7l5 19 5-19 5 19 5-19 5 19 5-19 5 19 5-19 5 19 5-19M75 7l5 19 5-19 5 19 5-19 5 19 5-19 5 19 5-19 5 19 5-19M7 55l5-19 5 19 5-19 5 19 5-19 5 19 5-19 5 19 5-19 5 19M75 55l5-19 5 19 5-19 5 19 5-19 5 19 5-19 5 19 5-19 5 19" fill="#a27a45" opacity=".55"/>
+            <path d="M66 3v56" stroke="#8c653b" stroke-width="3"/>
+            <g fill="#e6c88d" stroke="#b2955b" stroke-width=".7"><circle cx="122" cy="11" r="4"/><circle cx="122" cy="19" r="4"/><circle cx="12" cy="51" r="4"/><circle cx="12" cy="43" r="4"/><circle cx="82" cy="51" r="4"/><circle cx="82" cy="43" r="4"/><circle cx="82" cy="35" r="4"/></g>
+            <g fill="#312015" stroke="#8c6a42" stroke-width=".7"><circle cx="122" cy="51" r="4"/><circle cx="122" cy="43" r="4"/><circle cx="12" cy="11" r="4"/><circle cx="12" cy="19" r="4"/><circle cx="82" cy="11" r="4"/><circle cx="82" cy="19" r="4"/><circle cx="82" cy="27" r="4"/></g>
+          </svg>
+          <span class="variant-name" data-i18n="shortName">Короткие нарды</span>
+          <span class="variant-caption" data-i18n="shortCaption">Взятие шашек · игра с баром</span>
+        </button>
+        <button class="variant-option" type="button" role="radio" aria-checked="false" data-variant="long" tabindex="-1" aria-describedby="variant-description">
+          <span class="variant-radio" aria-hidden="true"></span>
+          <span class="variant-new" data-i18n="newVariant">Новое</span>
+          <svg class="variant-mini" viewBox="0 0 132 62" aria-hidden="true">
+            <rect x="1" y="1" width="130" height="60" rx="5" fill="#24170e" stroke="#987347"/>
+            <path d="M7 7l5 19 5-19 5 19 5-19 5 19 5-19 5 19 5-19 5 19 5-19M75 7l5 19 5-19 5 19 5-19 5 19 5-19 5 19 5-19 5 19 5-19M7 55l5-19 5 19 5-19 5 19 5-19 5 19 5-19 5 19 5-19 5 19M75 55l5-19 5 19 5-19 5 19 5-19 5 19 5-19 5 19 5-19 5 19" fill="#a27a45" opacity=".55"/>
+            <path d="M66 3v56" stroke="#8c653b" stroke-width="3"/>
+            <g fill="#e6c88d" stroke="#b2955b" stroke-width=".7"><circle cx="122" cy="11" r="4"/><circle cx="122" cy="17" r="4"/><circle cx="122" cy="23" r="4"/><circle cx="122" cy="29" r="4"/></g>
+            <g fill="#312015" stroke="#8c6a42" stroke-width=".7"><circle cx="12" cy="51" r="4"/><circle cx="12" cy="45" r="4"/><circle cx="12" cy="39" r="4"/><circle cx="12" cy="33" r="4"/></g>
+            <path d="M105 33H88l4-3m-4 3 4 3M28 29h17l-4-3m4 3-4 3" fill="none" stroke="#b49b68" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="variant-name" data-i18n="longName">Длинные нарды</span>
+          <span class="variant-caption" data-i18n="longCaption">Общее направление · без взятия</span>
+        </button>
+      </div>
+      <p class="variant-description" id="variant-description">Классическая расстановка. Сбивайте блоты и возвращайте шашки с бара.</p>
+      <div class="menu-buttons">
+        <button class="btn btn-primary" id="btn-mode-ai" data-i18n="playAI">Игра с ИИ</button>
+        <button class="btn" id="btn-mode-pvp" data-i18n="playPVP">Игра на двоих</button>
+        <button class="btn" id="btn-rules" data-i18n="rules">Правила</button>
+        <button class="btn btn-resume" id="btn-resume" data-i18n="resume" hidden>Вернуться к партии</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Правила -->
+  <div class="modal-overlay hidden" id="modal-rules" role="dialog" aria-modal="true" aria-labelledby="rules-title">
+    <div class="modal-card">
+      <h2 id="rules-title">Правила коротких нард</h2>
+      <ul class="rules-list" id="rules-list"></ul>
+      <button class="btn btn-primary" id="btn-close-rules" data-i18n="close">Закрыть</button>
+    </div>
+  </div>
+
+  <!-- Косметика (выбор темы полотна) -->
+  <div class="modal-overlay hidden" id="modal-cosmetics" role="dialog" aria-modal="true" aria-labelledby="cosmetics-title">
+    <div class="modal-card">
+      <h2 id="cosmetics-title" data-i18n="cosmeticsTitle">Оформление полотна</h2>
+      <div class="theme-grid" id="theme-grid"></div>
+      <button class="btn btn-primary" id="btn-close-cosmetics" data-i18n="close">Закрыть</button>
+    </div>
+  </div>
+
+  <!-- Победа -->
+  <div class="modal-overlay hidden" id="modal-win">
+    <div class="modal-card">
+      <h2 id="win-title">Победа!</h2>
+      <p id="win-desc"></p>
+      <button class="btn btn-primary" id="btn-win-new" data-i18n="newGame">Новая игра</button>
+    </div>
+  </div>
+
+  <script>
+    /** Локализация: обе разновидности нард, RU / EN. */
+    const I18N = {
+      ru: {
+        title: 'Нарды: Паук', menu: 'Меню', cosmetics: 'Косметика', cosmeticsTitle: 'Оформление полотна',
+        whitePlayer: 'Белые (Игрок 1)', blackPlayerAI: 'Черные (ИИ)', blackPlayerP2: 'Черные (Игрок 2)',
+        borneOff: 'Снято', roll: 'Бросить кубики', endTurn: 'Завершить ход',
+        undo: 'Отменить ход', newGame: 'Новая игра',
+        menuTitle: 'Нарды: Паук', menuSubtitle: 'Коллекционное издание',
+        variantLabel: 'Выберите вид игры', shortName: 'Короткие нарды', longName: 'Длинные нарды',
+        shortCaption: 'Взятие шашек · игра с баром', longCaption: 'Общее направление · без взятия',
+        shortDescription: 'Классическая расстановка. Сбивайте блоты и возвращайте шашки с бара.',
+        longDescription: 'Все 15 шашек начинают на голове. Пройдите круг к своему дому — без взятия и бара.',
+        newVariant: 'Новое', playAI: 'Игра с ИИ', playPVP: 'Игра на двоих',
+        rules: 'Правила', rulesTitleShort: 'Правила коротких нард', rulesTitleLong: 'Правила длинных нард',
+        close: 'Закрыть', resume: 'Вернуться к партии', chooseMode: 'Выберите вид и режим игры',
+        rollPrompt: 'Бросьте кубики', movePrompt: 'Ваш ход — выберите шашку', targetPrompt: 'Выберите подсвеченный пункт',
+        turnComplete: 'Ходы сделаны — завершите ход', aiThinking: 'ИИ обдумывает ход…',
+        noMoves: 'Нет доступных ходов — завершите ход',
+        whiteWins: 'Белые победили!', blackWins: 'Черные победили!',
+        winDesc: 'Все 15 шашек успешно выведены с доски.',
+        point: 'Пункт', white: 'белые', black: 'черные', head: 'голова', usedDie: 'использован', languageLabel: 'Switch to English',
+        rulesShort: [
+          'У каждого игрока 15 шашек в классической расстановке. Белые идут от пункта 24 к 1, черные — от 1 к 24.',
+          'Каждый кубик — отдельное перемещение. Дубль дает четыре перемещения на выпавшее число.',
+          'Нужно использовать максимум возможных кубиков. Если можно сыграть только один из двух — играйте больший, когда это возможно.',
+          'Пункт с двумя и более шашками соперника закрыт. Одиночную шашку можно сбить на бар.',
+          'Сначала верните в игру все свои шашки с бара. Затем можно двигать остальные.',
+          'Соберите все шашки в своем доме: белые — пункты 1–6, черные — 19–24. После этого их можно снимать с доски.',
+          'Для снятия нужен точный кубик. Больший разрешен, если дальше от края нет ваших шашек.',
+          'Нажимайте шашку, затем подсвеченный пункт. До нажатия «Завершить ход» перемещения можно отменить. Побеждает снявший все 15 шашек.'
+        ],
+        rulesLong: [
+          'У каждого игрока 15 шашек на одном пункте — «голове». Белые начинают на пункте 24, черные — на пункте 12.',
+          'Оба игрока идут в одном направлении, по убыванию номеров с переходом 1 → 24. Дом белых — пункты 1–6, черных — 13–18.',
+          'Взятия и бара нет. Даже одна шашка соперника полностью закрывает пункт для посадки.',
+          'С головы можно снять одну шашку за ход. Исключение: на первом ходу игрока при дубле 3–3, 4–4 или 6–6 разрешено снять две.',
+          'Дубль дает четыре перемещения. Используйте максимум возможных кубиков; если доступен только один из двух — больший, когда это возможно.',
+          'Нельзя запереть все шашки соперника блоком из шести пунктов подряд: хотя бы одна его шашка должна уже пройти такой блок.',
+          'Когда все шашки в своем доме, их можно снимать по значению кубиков. Большим кубиком снимают только самую дальнюю от выхода шашку.',
+          'Нажимайте шашку и подсвеченный пункт. До подтверждения кнопкой «Завершить ход» доступна отмена. Первым снимите все 15 шашек, чтобы победить.'
+        ]
+      },
+      en: {
+        title: 'Backgammon', menu: 'Menu', cosmetics: 'Cosmetics', cosmeticsTitle: 'Board Themes',
+        whitePlayer: 'White (Player 1)', blackPlayerAI: 'Black (AI)', blackPlayerP2: 'Black (Player 2)',
+        borneOff: 'Borne off', roll: 'Roll Dice', endTurn: 'End Turn', undo: 'Undo Move', newGame: 'New Game',
+        menuTitle: 'Backgammon', menuSubtitle: 'Collector’s Edition',
+        variantLabel: 'Choose your game', shortName: 'Backgammon', longName: 'Long Nardy',
+        shortCaption: 'Hit blots · re-enter from the bar', longCaption: 'One direction · no hitting',
+        shortDescription: 'The classic setup. Hit exposed checkers and re-enter your own from the bar.',
+        longDescription: 'All 15 checkers start on the head. Race to your home board, with no hitting or bar.',
+        newVariant: 'New', playAI: 'Play vs AI', playPVP: '2 Players (Local)',
+        rules: 'Rules', rulesTitleShort: 'Backgammon Rules', rulesTitleLong: 'Long Nardy Rules',
+        close: 'Close', resume: 'Return to Game', chooseMode: 'Choose a game and opponent',
+        rollPrompt: 'Roll the dice', movePrompt: 'Your turn — select a checker', targetPrompt: 'Choose a highlighted point',
+        turnComplete: 'Moves complete — end your turn', aiThinking: 'AI is thinking…',
+        noMoves: 'No legal moves — end your turn', whiteWins: 'White Wins!', blackWins: 'Black Wins!',
+        winDesc: 'All 15 checkers have been borne off.',
+        point: 'Point', white: 'white', black: 'black', head: 'head', usedDie: 'used', languageLabel: 'Переключить на русский',
+        rulesShort: [
+          'Each player has 15 checkers in the classic setup. White moves from point 24 to 1; Black moves from 1 to 24.',
+          'Each die is a separate move. Doubles grant four moves of that value.',
+          'You must use as many dice as possible. If only one of two dice can be used, you must use the higher value when legal.',
+          'Points occupied by two or more opposing checkers are blocked. A single opposing checker can be hit onto the bar.',
+          'All your checkers on the bar must re-enter before you move any others.',
+          'Bring all checkers into your home board: points 1–6 for White, 19–24 for Black. You may then bear them off.',
+          'Bear off with an exact die, or a higher die if no checker is farther from the exit.',
+          'Select a checker, then a highlighted point. Undo is available until you press End Turn. The first to bear off all 15 checkers wins.'
+        ],
+        rulesLong: [
+          'Each player starts with all 15 checkers on one point, the head: point 24 for White and point 12 for Black.',
+          'Both players move in the same direction: decreasing point numbers, wrapping from 1 to 24. White’s home is 1–6; Black’s is 13–18.',
+          'There is no hitting or bar. Even one opposing checker blocks a landing point.',
+          'Only one checker may leave the head each turn. On a player’s first turn, doubles of 3, 4 or 6 allow two to leave.',
+          'Doubles grant four moves. Use the maximum possible number of dice; if only one of two is playable, use the higher one when legal.',
+          'You may not trap all opposing checkers behind six consecutive occupied points. At least one opposing checker must already be past that block.',
+          'Once all your checkers are home, bear off using exact dice. An oversized die can remove only the checker farthest from the exit.',
+          'Select a checker and a highlighted point. You may undo moves until pressing End Turn. Bear off all 15 checkers first to win.'
+        ]
+      }
+    };
+
+    /**
+     * Независимая игровая логика. Пункты: 0..23.
+     * short: белые 23 → 0, черные 0 → 23; взятие и бар.
+     * long: обе стороны идут по убыванию с переходом 0 → 23.
+     * Головы long: белые 23, черные 11; дома: 0..5 и 12..17.
+     * Переменная progress (0..23) задает путь от своей головы до выхода.
+     */
+    class BackgammonGame {
+      constructor(mode = 'ai', variant = 'short') {
+        this.mode = mode === 'pvp' ? 'pvp' : 'ai';
+        this.variant = variant === 'long' ? 'long' : 'short';
+        this.reset();
+      }
+
+      reset() {
+        this.board = new Array(24).fill(0);
+        if (this.variant === 'long') {
+          this.board[23] = 15;
+          this.board[11] = -15;
+        } else {
+          this.board[23] = 2; this.board[12] = 5;
+          this.board[7] = 3; this.board[5] = 5;
+          this.board[0] = -2; this.board[11] = -5;
+          this.board[16] = -3; this.board[18] = -5;
+        }
+        this.bar = { white: 0, black: 0 };
+        this.borneOff = { white: 0, black: 0 };
+        this.currentPlayer = 'white';
+        this.dice = [];
+        this.remainingDice = [];
+        this.hasRolled = false;
+        this.history = [];
+        this.winner = null;
+        this.turnsPlayed = { white: 0, black: 0 };
+        this.headMovesThisTurn = 0;
+        this._legalCache = null;
+      }
+
+      head(player) {
+        return player === 'white' ? 23 : (this.variant === 'long' ? 11 : 0);
+      }
+
+      progress(index, player) {
+        if (this.variant === 'long') return (this.head(player) - index + 24) % 24;
+        return player === 'white' ? 23 - index : index;
+      }
+
+      indexAtProgress(progress, player) {
+        if (this.variant === 'long') return (this.head(player) - progress + 24) % 24;
+        return player === 'white' ? 23 - progress : progress;
+      }
+
+      rollDice() {
+        if (this.hasRolled || this.winner) return this.dice;
+        const d1 = 1 + Math.floor(Math.random() * 6);
+        const d2 = 1 + Math.floor(Math.random() * 6);
+        this.dice = [d1, d2];
+        this.remainingDice = d1 === d2 ? [d1, d1, d1, d1] : [d1, d2];
+        this.hasRolled = true;
+        this.history = [];
+        this.headMovesThisTurn = 0;
+        this._legalCache = null;
+        return this.dice;
+      }
+
+      cloneState() {
+        return {
+          board: [...this.board], bar: { ...this.bar }, borneOff: { ...this.borneOff },
+          remainingDice: [...this.remainingDice], headMovesThisTurn: this.headMovesThisTurn,
+          winner: this.winner
+        };
+      }
+
+      restoreState(state) {
+        this.board = [...state.board];
+        this.bar = { ...state.bar };
+        this.borneOff = { ...state.borneOff };
+        this.remainingDice = [...state.remainingDice];
+        this.headMovesThisTurn = state.headMovesThisTurn || 0;
+        this.winner = state.winner || null;
+      }
+
+      canBearOff(player) {
+        if (this.bar[player] > 0) return false;
+        const sign = player === 'white' ? 1 : -1;
+        return this.board.every((count, i) => count * sign <= 0 || this.progress(i, player) >= 18);
+      }
+
+      isPointOpen(index, player) {
+        if (index < 0 || index > 23) return false;
+        const value = this.board[index] * (player === 'white' ? 1 : -1);
+        return this.variant === 'long' ? value >= 0 : value >= -1;
+      }
+
+      headMoveLimit(player) {
+        const openingDouble = this.turnsPlayed[player] === 0 &&
+          this.dice.length === 2 && this.dice[0] === this.dice[1] && [3, 4, 6].includes(this.dice[0]);
+        return openingDouble ? 2 : 1;
+      }
+
+      /** Проверка запретного шестипунктового блока на маршруте соперника. */
+      _createsForbiddenPrime(move, player) {
+        if (this.variant !== 'long' || move.to === 'off' || this.board[move.to] !== 0) return false;
+        const opponent = player === 'white' ? 'black' : 'white';
+        if (this.borneOff[opponent] > 0) return false;
+        const sign = player === 'white' ? 1 : -1;
+        const valueAfter = (i) => this.board[i] - (i === move.from ? sign : 0) + (i === move.to ? sign : 0);
+        const targetProgress = this.progress(move.to, opponent);
+        // Только непрерывные участки реального пути соперника, без второго круга.
+        for (let start = Math.max(0, targetProgress - 5); start <= Math.min(18, targetProgress); start++) {
+          let full = true;
+          for (let k = 0; k < 6; k++) {
+            if (valueAfter(this.indexAtProgress(start + k, opponent)) * sign <= 0) {
+              full = false;
+              break;
+            }
+          }
+          if (!full) continue;
+          let opponentAhead = false;
+          for (let p = start + 6; p < 24; p++) {
+            if (valueAfter(this.indexAtProgress(p, opponent)) * sign < 0) {
+              opponentAhead = true;
+              break;
+            }
+          }
+          if (!opponentAhead) return true;
+        }
+        return false;
+      }
+
+      /** Одношаговые ходы; обязательное использование кубиков проверяется ниже. */
+      _getRawMoves(player) {
+        if (!this.hasRolled || this.winner || this.remainingDice.length === 0) return [];
+        const moves = [];
+        const dice = [...new Set(this.remainingDice)].sort((a, b) => b - a);
+        const sign = player === 'white' ? 1 : -1;
+        if (this.variant === 'short' && this.bar[player] > 0) {
+          for (const die of dice) {
+            const to = this.indexAtProgress(die - 1, player);
+            if (this.isPointOpen(to, player)) moves.push({ from: 'bar', to, die });
+          }
+          return moves;
+        }
+        const canBear = this.canBearOff(player);
+        for (let from = 0; from < 24; from++) {
+          if (this.board[from] * sign <= 0) continue;
+          if (this.variant === 'long' && from === this.head(player) && this.headMovesThisTurn >= this.headMoveLimit(player)) continue;
+          const progress = this.progress(from, player);
+          for (const die of dice) {
+            const destination = progress + die;
+            if (destination < 24) {
+              const to = this.indexAtProgress(destination, player);
+              const move = { from, to, die };
+              if (this.isPointOpen(to, player) && !this._createsForbiddenPrime(move, player)) moves.push(move);
+            } else if (canBear) {
+              const hasFarther = this.board.some((n, i) => n * sign > 0 && this.progress(i, player) < progress);
+              if (destination === 24 || !hasFarther) moves.push({ from, to: 'off', die });
+            }
+          }
+        }
+        return moves;
+      }
+
+      _stateKey() {
+        return this.board.join(',') + '|' + this.bar.white + ',' + this.bar.black + '|' +
+          this.borneOff.white + ',' + this.borneOff.black + '|' + [...this.remainingDice].sort().join(',') +
+          '|' + this.headMovesThisTurn + '|' + (this.winner || '');
+      }
+
+      /** Применяется и для поиска: без истории, без изменения очередности. */
+      _applyMove(move, player) {
+        const sign = player === 'white' ? 1 : -1;
+        if (move.from === 'bar') this.bar[player]--;
+        else {
+          this.board[move.from] -= sign;
+          if (this.variant === 'long' && move.from === this.head(player)) this.headMovesThisTurn++;
+        }
+        if (move.to === 'off') this.borneOff[player]++;
+        else {
+          if (this.variant === 'short' && this.board[move.to] === -sign) {
+            this.board[move.to] = 0;
+            this.bar[player === 'white' ? 'black' : 'white']++;
+          }
+          this.board[move.to] += sign;
+        }
+        const dieIndex = this.remainingDice.indexOf(move.die);
+        if (dieIndex !== -1) this.remainingDice.splice(dieIndex, 1);
+        if (this.borneOff[player] === 15) this.winner = player;
+      }
+
+      _maxPlayableDice(player, memo) {
+        if (this.remainingDice.length === 0 || this.winner) return 0;
+        const key = this._stateKey();
+        if (memo.has(key)) return memo.get(key);
+        const snapshot = this.cloneState();
+        let best = 0;
+        for (const move of this._getRawMoves(player)) {
+          this._applyMove(move, player);
+          best = Math.max(best, 1 + this._maxPlayableDice(player, memo));
+          this.restoreState(snapshot);
+          if (best === snapshot.remainingDice.length) break;
+        }
+        memo.set(key, best);
+        return best;
+      }
+
+      /**
+       * Легальны только начала последовательностей, использующих максимум кубиков.
+       * Если можно использовать лишь один из двух разных кубиков, обязателен больший.
+       */
+      getLegalMoves(player = this.currentPlayer) {
+        if (!this.hasRolled || this.winner || this.remainingDice.length === 0) return [];
+        const key = player + '|' + this.turnsPlayed[player] + '|' + this.dice.join(',') + '|' + this._stateKey();
+        if (this._legalCache && this._legalCache.key === key) return this._legalCache.moves;
+        const raw = this._getRawMoves(player);
+        let moves = raw;
+        if (raw.length && this.remainingDice.length > 1) {
+          const snapshot = this.cloneState();
+          const memo = new Map();
+          let maximum = 0;
+          const scored = raw.map(move => {
+            this._applyMove(move, player);
+            const count = 1 + this._maxPlayableDice(player, memo);
+            this.restoreState(snapshot);
+            maximum = Math.max(maximum, count);
+            return { move, count };
+          });
+          moves = scored.filter(item => item.count === maximum).map(item => item.move);
+          if (maximum === 1 && new Set(this.remainingDice).size > 1) {
+            const higher = Math.max(...moves.map(move => move.die));
+            moves = moves.filter(move => move.die === higher);
+          }
+        }
+        this._legalCache = { key, moves };
+        return moves;
+      }
+
+      makeMove(move) {
+        const valid = this.getLegalMoves().find(m => m.from === move.from && m.to === move.to && m.die === move.die);
+        if (!valid) return false;
+        this.history.push(this.cloneState());
+        this._applyMove(valid, this.currentPlayer);
+        this._legalCache = null;
+        return true;
+      }
+
+      undo() {
+        if (this.history.length === 0) return false;
+        this.restoreState(this.history.pop());
+        this._legalCache = null;
+        return true;
+      }
+
+      endTurn() {
+        if (!this.hasRolled || this.winner || this.getLegalMoves().length) return false;
+        this.turnsPlayed[this.currentPlayer]++;
+        this.currentPlayer = this.currentPlayer === 'white' ? 'black' : 'white';
+        this.hasRolled = false;
+        this.dice = [];
+        this.remainingDice = [];
+        this.history = [];
+        this.headMovesThisTurn = 0;
+        this._legalCache = null;
+        return true;
+      }
+
+      /** Один ИИ для обоих вариантов, с учетом разных направлений и правил. */
+      chooseAIMove() {
+        if (this.currentPlayer !== 'black') return null;
+        let bestMove = null;
+        let bestScore = -Infinity;
+        for (const move of this.getLegalMoves('black')) {
+          let score = Math.random() * 3;
+          if (move.to === 'off') score += 55;
+          if (move.from === 'bar') score += 35;
+          if (typeof move.to === 'number') {
+            score += this.progress(move.to, 'black') * .45;
+            if (this.variant === 'short') {
+              if (this.board[move.to] === 1) score += 40;
+              if (this.board[move.to] === -1) score += 25;
+              if (this.board[move.from] === -2) score -= 12;
+            } else {
+              if (move.from === this.head('black')) score += 16;
+              if (this.board[move.to] === 0) score += 9;
+              if (this.board[move.to] < -3) score -= 7;
+              if (typeof move.from === 'number' && this.progress(move.from, 'black') < 12) score += 4;
+              score += move.die * .5;
+            }
+          }
+          if (score > bestScore) { bestScore = score; bestMove = move; }
+        }
+        return bestMove;
+      }
+    }
+
+    /** Контроллер. Дизайн резной доски одинаков для обеих игр. */
+    let lang = 'ru';
+    let game = new BackgammonGame('ai', 'short');
+    let selectedVariant = 'short';
+    let selectedSource = null;
+    let hasStarted = false;
+    let isAnimating = false;
+    let sessionVersion = 0;
+    const pendingTimers = new Set();
+    const byId = (id) => document.getElementById(id);
+    const els = {
+      rowTopLeft: byId('row-top-left'), rowTopRight: byId('row-top-right'),
+      rowBottomLeft: byId('row-bottom-left'), rowBottomRight: byId('row-bottom-right'),
+      barWhite: byId('bar-white'), barBlack: byId('bar-black'),
+      trayWhite: byId('tray-white'), trayBlack: byId('tray-black'), diceArea: byId('dice-area'),
+      btnRoll: byId('btn-roll'), btnEnd: byId('btn-end'), btnUndo: byId('btn-undo'), btnNew: byId('btn-new'),
+      btnMenu: byId('btn-menu'), btnLang: byId('btn-lang'), btnResume: byId('btn-resume'),
+      status: byId('status-text'), gameVariant: byId('game-variant-label'), board: byId('board-frame'),
+      offWhite: byId('off-white'), offBlack: byId('off-black'),
+      cardWhite: byId('card-white'), cardBlack: byId('card-black'), nameBlack: byId('name-black'),
+      modalMenu: byId('modal-menu'), modalRules: byId('modal-rules'), modalWin: byId('modal-win'),
+      rulesList: byId('rules-list'), rulesTitle: byId('rules-title'), variantDescription: byId('variant-description')
+    };
+
+    const isHumanTurn = () => game.mode !== 'ai' || game.currentPlayer === 'white';
+    const overlayOpen = () => !els.modalMenu.classList.contains('hidden') || !els.modalRules.classList.contains('hidden');
+    const variantName = (variant) => I18N[lang][variant === 'long' ? 'longName' : 'shortName'];
+
+    // Все отложенные действия привязаны к партии; смена режима отменяет старый ИИ.
+    function later(callback, delay) {
+      const version = sessionVersion;
+      const timer = setTimeout(() => {
+        pendingTimers.delete(timer);
+        if (version !== sessionVersion) return;
+        if (overlayOpen()) { later(callback, 180); return; }
+        callback();
+      }, delay);
+      pendingTimers.add(timer);
+    }
+
+    function cancelPendingActions() {
+      sessionVersion++;
+      pendingTimers.forEach(timer => clearTimeout(timer));
+      pendingTimers.clear();
+      document.querySelectorAll('.flying-checker').forEach(el => el.remove());
+      isAnimating = false;
+    }
+
+    function updateMenuSelection() {
+      document.querySelectorAll('.variant-option').forEach(button => {
+        const active = button.dataset.variant === selectedVariant;
+        button.classList.toggle('is-selected', active);
+        button.setAttribute('aria-checked', String(active));
+        button.tabIndex = active ? 0 : -1;
+      });
+      const dict = I18N[lang];
+      els.variantDescription.textContent = dict[selectedVariant === 'long' ? 'longDescription' : 'shortDescription'];
+      els.rulesTitle.textContent = dict[selectedVariant === 'long' ? 'rulesTitleLong' : 'rulesTitleShort'];
+      els.rulesList.replaceChildren(...dict[selectedVariant === 'long' ? 'rulesLong' : 'rulesShort'].map(text => {
+        const li = document.createElement('li');
+        li.textContent = text;
+        return li;
+      }));
+      els.btnResume.hidden = !hasStarted;
+    }
+
+    function applyLanguage() {
+      const dict = I18N[lang];
+      document.documentElement.lang = lang;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const text = dict[el.dataset.i18n];
+        if (typeof text === 'string') el.textContent = text;
+      });
+      els.nameBlack.textContent = game.mode === 'ai' ? dict.blackPlayerAI : dict.blackPlayerP2;
+      els.btnLang.textContent = lang === 'ru' ? 'EN' : 'RU';
+      els.btnLang.setAttribute('aria-label', dict.languageLabel);
+      const btnLangMenu = byId('btn-lang-menu');
+      if (btnLangMenu) {
+        btnLangMenu.textContent = els.btnLang.textContent;
+        btnLangMenu.setAttribute('aria-label', dict.languageLabel);
+      }
+      els.gameVariant.textContent = variantName(game.variant);
+      document.title = `${dict.title} · ${variantName(game.variant)} — Collector’s Edition`;
+      updateMenuSelection();
+      if (game.winner) updateWinText();
+      updateStatus();
+    }
+
+    function updateStatus(legalMoves = game.getLegalMoves()) {
+      const dict = I18N[lang];
+      if (!hasStarted) els.status.textContent = dict.chooseMode;
+      else if (game.winner) els.status.textContent = game.winner === 'white' ? dict.whiteWins : dict.blackWins;
+      else if (!isHumanTurn()) els.status.textContent = dict.aiThinking;
+      else if (!game.hasRolled) els.status.textContent = dict.rollPrompt;
+      else if (legalMoves.length === 0) els.status.textContent = game.history.length ? dict.turnComplete : dict.noMoves;
+      else els.status.textContent = selectedSource === null ? dict.movePrompt : dict.targetPrompt;
+    }
+
+    function buildBoardPoints() {
+      const createPoint = (index) => {
+        const pt = document.createElement('div');
+        pt.className = `point ${index % 2 === 0 ? 'light' : 'dark'}`;
+        pt.dataset.index = index;
+        pt.setAttribute('role', 'button');
+        pt.tabIndex = 0;
+        pt.addEventListener('click', () => onPointClick(index));
+        pt.addEventListener('keydown', event => {
+          if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onPointClick(index); }
+        });
+        return pt;
+      };
+      [els.rowTopLeft, els.rowTopRight, els.rowBottomLeft, els.rowBottomRight].forEach(row => row.replaceChildren());
+      for (let i = 12; i <= 17; i++) els.rowTopLeft.appendChild(createPoint(i));
+      for (let i = 18; i <= 23; i++) els.rowTopRight.appendChild(createPoint(i));
+      for (let i = 11; i >= 6; i--) els.rowBottomLeft.appendChild(createPoint(i));
+      for (let i = 5; i >= 0; i--) els.rowBottomRight.appendChild(createPoint(i));
+    }
+
+    /**
+     * Круглые посадочные места, без растянутых SVG-эллипсов и фиксированной высоты.
+     * Радиус выреза равен радиусу шашки, а его центр — центру крайней шашки.
+     * Незначительное перекрытие прячет субпиксельную щель по линии соприкосновения.
+     */
+    function syncCheckerSeats() {
+      document.querySelectorAll('.board-half').forEach(half => {
+        const topRow = half.querySelector('.row.top');
+        const firstPoint = topRow && topRow.querySelector('.point');
+        if (!firstPoint) return;
+        const halfRect = half.getBoundingClientRect();
+        if (!halfRect.width) return;
+        const style = getComputedStyle(half);
+        const ratio = parseFloat(style.getPropertyValue('--checker-width-ratio')) || 0.78;
+        const diameter = Math.floor(Math.min(46, firstPoint.getBoundingClientRect().width * ratio) * 64) / 64;
+        half.style.setProperty('--checker-diameter', `${diameter}px`);
+        const radius = Math.max(1, diameter / 2 - 0.35);
+        const number = value => Number(value.toFixed(4));
+
+        half.querySelectorAll('.carve-ledge').forEach(ledge => {
+          const row = half.querySelector(ledge.classList.contains('top') ? '.row.top' : '.row.bottom');
+          const width = halfRect.width;
+          const height = ledge.getBoundingClientRect().height;
+          const svg = ledge.querySelector('svg');
+          const paths = svg.querySelectorAll('path');
+          const edge = [...row.querySelectorAll('.point')].reverse().map(point => {
+            const rect = point.getBoundingClientRect();
+            const center = rect.left + rect.width / 2 - halfRect.left;
+            return `H ${number(center + radius)} A ${number(radius)} ${number(radius)} 0 0 0 ${number(center - radius)} ${number(height)}`;
+          }).join(' ') + ' H 0';
+
+          // ViewBox в экранных пикселях: вырез остаётся кругом на любой ширине.
+          svg.setAttribute('viewBox', `0 0 ${number(width)} ${number(height)}`);
+          paths[0].setAttribute('d', `M 0 0 H ${number(width)} V ${number(height)} ${edge} Z`);
+          paths[1].setAttribute('d', `M ${number(width)} ${number(height)} ${edge}`);
+          paths[2].setAttribute('d', `M 0 0.75 H ${number(width)}`);
+          paths[2].setAttribute('stroke-width', '1.5');
+        });
+      });
+    }
+
+    function render() {
+      const legalMoves = game.getLegalMoves();
+      const human = isHumanTurn();
+      const movableSources = new Set(human && !isAnimating ? legalMoves.map(m => m.from) : []);
+      const dict = I18N[lang];
+      els.board.dataset.variant = game.variant;
+      els.gameVariant.textContent = variantName(game.variant);
+      document.querySelectorAll('.point').forEach(pt => {
+        const index = Number(pt.dataset.index);
+        const count = game.board[index];
+        pt.replaceChildren();
+        pt.classList.remove('valid-target');
+        pt.title = `${dict.point} ${index + 1}` + (count ? ` — ${count > 0 ? dict.white : dict.black}: ${Math.abs(count)}` : '');
+        if (game.variant === 'long' && (index === game.head('white') || index === game.head('black'))) pt.title += ` (${dict.head})`;
+        pt.setAttribute('aria-label', pt.title);
+        if (!count) return;
+        const color = count > 0 ? 'white' : 'black';
+        const total = Math.abs(count);
+        const visible = Math.min(total, 5);
+        for (let i = 0; i < visible; i++) {
+          const checker = document.createElement('div');
+          checker.className = `checker ${color}`;
+          const topChecker = index >= 12 ? i === visible - 1 : i === 0;
+          if (topChecker && color === game.currentPlayer && movableSources.has(index)) {
+            checker.classList.add('movable');
+            if (selectedSource === index) checker.classList.add('selected');
+          }
+          pt.appendChild(checker);
+        }
+        if (total > 5) {
+          const badge = document.createElement('span');
+          badge.className = 'stack-badge';
+          badge.textContent = total;
+          pt.appendChild(badge);
+        }
+      });
+      els.trayWhite.classList.remove('valid-target');
+      els.trayBlack.classList.remove('valid-target');
+      if (selectedSource !== null && human && !isAnimating) {
+        legalMoves.filter(m => m.from === selectedSource).forEach(move => {
+          const target = move.to === 'off'
+            ? (game.currentPlayer === 'white' ? els.trayWhite : els.trayBlack)
+            : document.querySelector(`.point[data-index="${move.to}"]`);
+          if (target) target.classList.add('valid-target');
+        });
+      }
+      renderBar(els.barWhite, 'white', movableSources);
+      renderBar(els.barBlack, 'black', movableSources);
+      renderTray(els.trayWhite, 'white', game.borneOff.white);
+      renderTray(els.trayBlack, 'black', game.borneOff.black);
+      els.offWhite.textContent = game.borneOff.white;
+      els.offBlack.textContent = game.borneOff.black;
+      els.cardWhite.classList.toggle('active', hasStarted && game.currentPlayer === 'white');
+      els.cardBlack.classList.toggle('active', hasStarted && game.currentPlayer === 'black');
+      els.nameBlack.textContent = game.mode === 'ai' ? dict.blackPlayerAI : dict.blackPlayerP2;
+      els.btnRoll.hidden = game.hasRolled && human && !game.winner;
+      els.btnRoll.disabled = !hasStarted || game.hasRolled || !human || !!game.winner || isAnimating;
+      els.btnEnd.hidden = !game.hasRolled || !human || !!game.winner;
+      els.btnEnd.disabled = legalMoves.length > 0 || isAnimating || !!game.winner;
+      els.btnUndo.disabled = game.history.length === 0 || !human || !!game.winner || isAnimating;
+      renderDice();
+      updateStatus(legalMoves);
+    }
+
+    function renderBar(container, color, movableSources) {
+      container.replaceChildren();
+      for (let i = 0; i < Math.min(game.bar[color], 4); i++) {
+        const checker = document.createElement('div');
+        checker.className = `checker ${color}`;
+        checker.style.width = 'min(30px, 100%)';
+        checker.style.margin = '0';
+        if (color === game.currentPlayer && movableSources.has('bar') && i === 0) {
+          checker.classList.add('movable');
+          if (selectedSource === 'bar') checker.classList.add('selected');
+        }
+        container.appendChild(checker);
+      }
+    }
+
+    function renderTray(container, color, count) {
+      container.replaceChildren();
+      container.title = `${I18N[lang].borneOff} — ${I18N[lang][color]}: ${count}/15`;
+      container.setAttribute('aria-label', container.title);
+      for (let i = 0; i < count; i++) {
+        const chip = document.createElement('div');
+        chip.className = `bear-off-chip ${color}`;
+        container.appendChild(chip);
+      }
+    }
+
+    function renderDice(animate = false) {
+      els.diceArea.replaceChildren();
+      if (!game.hasRolled || !game.dice.length) return;
+      const doubles = game.dice[0] === game.dice[1];
+      els.diceArea.classList.toggle('is-double', doubles);
+      const values = doubles ? Array(4).fill(game.dice[0]) : game.dice;
+      const pipMap = { 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
+      const remaining = [...game.remainingDice];
+      values.forEach(value => {
+        const die = document.createElement('div');
+        const index = remaining.indexOf(value);
+        const used = index === -1;
+        die.className = 'die' + (animate ? ' rolling' : '') + (used ? ' used' : '');
+        die.setAttribute('aria-label', `${value}${used ? ' — ' + I18N[lang].usedDie : ''}`);
+        die.setAttribute('role', 'img');
+        if (!used) remaining.splice(index, 1);
+        for (let i = 0; i < 9; i++) {
+          const cell = document.createElement('div');
+          if (pipMap[value].includes(i)) cell.className = 'pip';
+          die.appendChild(cell);
+        }
+        els.diceArea.appendChild(die);
+      });
+    }
+
+    /** Плавное перемещение шашек — requestAnimationFrame, без библиотек. */
+    function animateMove(from, to, color, callback) {
+      const version = sessionVersion;
+      const point = (index) => document.querySelector(`.point[data-index="${index}"]`);
+      const sourceContainer = from === 'bar' ? (color === 'white' ? els.barWhite : els.barBlack) : point(from);
+      const pieces = sourceContainer.querySelectorAll('.checker');
+      const sourceChecker = from !== 'bar' && from >= 12 ? pieces[pieces.length - 1] : pieces[0];
+      const start = (sourceChecker || sourceContainer).getBoundingClientRect();
+      const destination = to === 'off' ? (color === 'white' ? els.trayWhite : els.trayBlack) : point(to);
+      const end = destination.getBoundingClientRect();
+      const size = Math.min(start.width, 44);
+      const startX = start.left + (start.width - size) / 2;
+      const startY = start.top + (start.height - size) / 2;
+      const endX = end.left + (end.width - size) / 2;
+      let endY = end.top + (end.height - size) / 2;
+      if (typeof to === 'number') {
+        const destPieces = destination.querySelectorAll('.checker');
+        if (destPieces.length) {
+          const anchor = (to >= 12 ? destPieces[destPieces.length - 1] : destPieces[0]).getBoundingClientRect();
+          endY = anchor.top + (destPieces.length < 5 ? (to >= 12 ? 1 : -1) * size * .55 : 0);
+        } else endY = to >= 12 ? end.top + 12 : end.bottom - size - 12;
+      }
+      const flyer = document.createElement('div');
+      flyer.className = `flying-checker ${color}`;
+      flyer.style.width = `${size}px`;
+      flyer.style.height = `${size}px`;
+      document.body.appendChild(flyer);
+      if (sourceChecker) sourceChecker.style.opacity = '0';
+      const startTime = performance.now();
+      function step(now) {
+        if (version !== sessionVersion) { flyer.remove(); if (sourceChecker) sourceChecker.style.opacity = ''; return; }
+        const t = Math.min((now - startTime) / 240, 1);
+        const ease = 1 - Math.pow(1 - t, 3);
+        flyer.style.left = `${startX + (endX - startX) * ease}px`;
+        flyer.style.top = `${startY + (endY - startY) * ease - Math.sin(Math.PI * t) * 18}px`;
+        if (t < 1) requestAnimationFrame(step);
+        else {
+          flyer.remove();
+          if (sourceChecker) sourceChecker.style.opacity = '';
+          isAnimating = false;
+          callback();
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    function executeMove(move) {
+      if (isAnimating || game.winner) return;
+      if (!game.getLegalMoves().some(m => m.from === move.from && m.to === move.to && m.die === move.die)) return;
+      const color = game.currentPlayer;
+      selectedSource = null;
+      isAnimating = true;
+      render();
+      animateMove(move.from, move.to, color, () => {
+        if (!game.makeMove(move)) { render(); return; }
+        render();
+        if (game.winner) { showWinModal(); return; }
+        if (!isHumanTurn()) {
+          if (game.getLegalMoves().length) later(runAIMoveStep, 280);
+          else later(finishTurn, 600);
+        }
+        // У человека ход не переключается автоматически: есть время на Undo.
+      });
+    }
+
+    function canInteract() {
+      return hasStarted && !isAnimating && !game.winner && game.hasRolled && isHumanTurn() && !overlayOpen();
+    }
+
+    function onPointClick(index) {
+      if (!canInteract()) return;
+      const moves = game.getLegalMoves();
+      if (selectedSource !== null) {
+        const move = moves.find(m => m.from === selectedSource && m.to === index);
+        if (move) { executeMove(move); return; }
+      }
+      if (moves.some(m => m.from === index)) {
+        selectedSource = selectedSource === index ? null : index;
+        render();
+      } else if (selectedSource !== null) { selectedSource = null; render(); }
+    }
+
+    function onBarClick(color) {
+      if (!canInteract() || game.currentPlayer !== color || game.variant === 'long') return;
+      if (game.getLegalMoves().some(m => m.from === 'bar')) {
+        selectedSource = selectedSource === 'bar' ? null : 'bar';
+        render();
+      }
+    }
+
+    function onTrayClick(color) {
+      if (!canInteract() || game.currentPlayer !== color || selectedSource === null) return;
+      const move = game.getLegalMoves().find(m => m.from === selectedSource && m.to === 'off');
+      if (move) executeMove(move);
+    }
+
+    function finishTurn() {
+      if (isAnimating || !hasStarted || !game.endTurn()) return;
+      selectedSource = null;
+      render();
+      if (!isHumanTurn()) runAITurn();
+    }
+
+    function runAITurn() {
+      if (game.winner || isHumanTurn() || game.hasRolled) return;
+      later(() => {
+        if (game.winner || isHumanTurn() || game.hasRolled) return;
+        game.rollDice();
+        render();
+        renderDice(true);
+        later(runAIMoveStep, 600);
+      }, 450);
+    }
+
+    function runAIMoveStep() {
+      if (game.winner || isHumanTurn() || !game.hasRolled || isAnimating) return;
+      const move = game.chooseAIMove();
+      if (move) executeMove(move);
+      else later(finishTurn, 650);
+    }
+
+    function updateWinText() {
+      const dict = I18N[lang];
+      byId('win-title').textContent = game.winner === 'white' ? dict.whiteWins : dict.blackWins;
+      byId('win-desc').textContent = `${variantName(game.variant)}. ${dict.winDesc}`;
+    }
+
+    function showWinModal() {
+      updateWinText();
+      els.modalWin.classList.remove('hidden');
+      byId('btn-win-new').focus();
+    }
+
+    function startNewGame(mode = game.mode, variant = selectedVariant) {
+      cancelPendingActions();
+      game = new BackgammonGame(mode, variant);
+      selectedVariant = game.variant;
+      selectedSource = null;
+      hasStarted = true;
+      els.modalMenu.classList.add('hidden');
+      els.modalRules.classList.add('hidden');
+      els.modalWin.classList.add('hidden');
+      applyLanguage();
+      render();
+      els.btnRoll.focus({ preventScroll: true });
+    }
+
+    function openMenu() {
+      selectedVariant = game.variant;
+      updateMenuSelection();
+      els.modalMenu.classList.remove('hidden');
+      document.querySelector(`.variant-option[data-variant="${selectedVariant}"]`).focus({ preventScroll: true });
+    }
+
+    function resumeGame() {
+      if (!hasStarted) return;
+      els.modalRules.classList.add('hidden');
+      els.modalMenu.classList.add('hidden');
+      els.btnMenu.focus({ preventScroll: true });
+    }
+
+    document.querySelectorAll('.variant-option').forEach(button => {
+      button.addEventListener('click', () => { selectedVariant = button.dataset.variant; updateMenuSelection(); });
+      button.addEventListener('keydown', event => {
+        if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        selectedVariant = event.key === 'Home' ? 'short' : event.key === 'End' ? 'long' : selectedVariant === 'long' ? 'short' : 'long';
+        updateMenuSelection();
+        document.querySelector(`.variant-option[data-variant="${selectedVariant}"]`).focus();
+      });
+    });
+    byId('btn-mode-ai').addEventListener('click', () => startNewGame('ai', selectedVariant));
+    byId('btn-mode-pvp').addEventListener('click', () => startNewGame('pvp', selectedVariant));
+    els.btnNew.addEventListener('click', () => startNewGame(game.mode, game.variant));
+    byId('btn-win-new').addEventListener('click', () => startNewGame(game.mode, game.variant));
+    els.btnMenu.addEventListener('click', openMenu);
+    els.btnResume.addEventListener('click', resumeGame);
+    byId('btn-rules').addEventListener('click', () => {
+      updateMenuSelection();
+      els.modalRules.classList.remove('hidden');
+      byId('btn-close-rules').focus();
+    });
+    byId('btn-close-rules').addEventListener('click', () => {
+      els.modalRules.classList.add('hidden');
+      byId('btn-rules').focus();
+    });
+    els.modalMenu.addEventListener('click', event => { if (event.target === els.modalMenu) resumeGame(); });
+    els.btnLang.addEventListener('click', () => {
+      lang = lang === 'ru' ? 'en' : 'ru';
+      applyLanguage();
+      render();
+    });
+    const btnLangMenuEl = byId('btn-lang-menu');
+    if (btnLangMenuEl) {
+      btnLangMenuEl.addEventListener('click', () => {
+        lang = lang === 'ru' ? 'en' : 'ru';
+        applyLanguage();
+        render();
+      });
+    }
+    els.btnRoll.addEventListener('click', () => {
+      if (!hasStarted || isAnimating || game.hasRolled || game.winner || !isHumanTurn() || overlayOpen()) return;
+      game.rollDice();
+      selectedSource = null;
+      render();
+      renderDice(true);
+    });
+    els.btnEnd.addEventListener('click', () => { if (isHumanTurn() && !overlayOpen()) finishTurn(); });
+    els.btnUndo.addEventListener('click', () => {
+      if (isAnimating || !isHumanTurn() || overlayOpen()) return;
+      if (game.undo()) { selectedSource = null; render(); }
+    });
+    els.barWhite.addEventListener('click', () => onBarClick('white'));
+    els.barBlack.addEventListener('click', () => onBarClick('black'));
+    els.trayWhite.addEventListener('click', () => onTrayClick('white'));
+    els.trayBlack.addEventListener('click', () => onTrayClick('black'));
+    [els.trayWhite, els.trayBlack, els.barWhite, els.barBlack].forEach(el => {
+      el.setAttribute('role', 'button');
+      el.tabIndex = 0;
+      el.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); el.click(); }
+      });
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        if (!els.modalRules.classList.contains('hidden')) { els.modalRules.classList.add('hidden'); byId('btn-rules').focus(); }
+        else if (!els.modalMenu.classList.contains('hidden')) resumeGame();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const modal = [els.modalWin, els.modalRules, els.modalMenu].find(el => !el.classList.contains('hidden'));
+      if (!modal) return;
+      const focusable = [...modal.querySelectorAll('button:not([disabled]):not([hidden])')].filter(el => el.tabIndex >= 0);
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && (document.activeElement === first || !modal.contains(document.activeElement))) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && (document.activeElement === last || !modal.contains(document.activeElement))) { event.preventDefault(); first.focus(); }
+    });
+
+    buildBoardPoints();
+    applyLanguage();
+    render();
+    syncCheckerSeats();
+    if ('ResizeObserver' in window) {
+      const seatResizeObserver = new ResizeObserver(syncCheckerSeats);
+      document.querySelectorAll('.board-half').forEach(half => seatResizeObserver.observe(half));
+    } else {
+      window.addEventListener('resize', syncCheckerSeats, { passive: true });
+    }
+    /**
+     * Темы полотна доски (Косметика) — меняют только полотно .board-half и .board-art
+     */
+    const BOARD_THEMES = {
+      spider: {
+        nameRu: 'Паутина',
+        nameEn: 'Spider Web',
+        bg: 'repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.08) 0px, rgba(0, 0, 0, 0.08) 2px, transparent 2px, transparent 9px), radial-gradient(ellipse at center, #4b3321 0%, #342114 65%, #23150c 100%)',
+        svg: `<svg viewBox="0 0 200 200" fill="none" stroke="#1d0e05" stroke-width="1.6">
+          <path d="M100 10 L100 190 M10 100 L190 100 M36 36 L164 164 M164 36 L36 164"/>
+          <polygon points="100,25 153,47 175,100 153,153 100,175 47,153 25,100 47,47"/>
+          <polygon points="100,50 135,65 150,100 135,135 100,150 65,135 50,100 65,65"/>
+          <polygon points="100,74 118,82 126,100 118,118 100,126 82,118 74,100 82,82"/>
+          <ellipse cx="100" cy="108" rx="11" ry="15" fill="#1d0e05"/>
+          <circle cx="100" cy="88" r="7" fill="#1d0e05"/>
+          <path d="M93 88 Q75 72 68 85 M93 93 Q72 92 66 105 M93 98 Q74 112 72 126 M94 104 Q80 124 82 138" stroke-width="2.2"/>
+          <path d="M107 88 Q125 72 132 85 M107 93 Q128 92 134 105 M107 98 Q126 112 128 126 M106 104 Q120 124 118 138" stroke-width="2.2"/>
+        </svg>`
+      },
+      celtic: {
+        nameRu: 'Кельтский узор',
+        nameEn: 'Celtic Knot',
+        bg: 'repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.1) 0px, rgba(0, 0, 0, 0.1) 2px, transparent 2px, transparent 8px), radial-gradient(ellipse at center, #59412e 0%, #3c291b 65%, #26180f 100%)',
+        svg: `<svg viewBox="0 0 200 200" fill="none" stroke="#1a0c04" stroke-width="3">
+          <circle cx="100" cy="100" r="66"/>
+          <circle cx="100" cy="100" r="46"/>
+          <rect x="44" y="44" width="112" height="112" rx="14" transform="rotate(45 100 100)"/>
+          <rect x="44" y="44" width="112" height="112" rx="14"/>
+          <path d="M100 18 V182 M18 100 H182" stroke-width="2.5"/>
+          <circle cx="100" cy="100" r="14" fill="#1a0c04" fill-opacity="0.35"/>
+        </svg>`
+      },
+      marquetry: {
+        nameRu: 'Маркетри',
+        nameEn: 'Marquetry Inlay',
+        bg: 'repeating-linear-gradient(90deg, rgba(120, 92, 55, 0.10) 0px, rgba(120, 92, 55, 0.10) 2px, transparent 2px, transparent 9px), radial-gradient(ellipse at center, #f2e6cd 0%, #e4d2ae 62%, #cdb488 100%)',
+        fullBoard: true,
+        previewSvg: `<svg viewBox="0 0 200 200" fill="none" stroke="#2a1708" stroke-width="2.4">
+          <path d="M100 12 L100 188 M12 100 L188 100 M38 38 L162 162 M162 38 L38 162"/>
+          <polygon points="100,26 154,50 174,100 154,150 100,174 46,150 26,100 46,50"/>
+          <polygon points="100,54 132,68 146,100 132,132 100,146 68,132 54,100 68,68"/>
+          <ellipse cx="100" cy="112" rx="10" ry="14" fill="#2a1708"/>
+          <circle cx="100" cy="92" r="7" fill="#2a1708"/>
+          <path d="M93 92 Q74 76 67 89 M93 97 Q72 96 66 108 M93 102 Q74 116 72 130" stroke-width="2.6"/>
+          <path d="M107 92 Q126 76 133 89 M107 97 Q128 96 134 108 M107 102 Q126 116 128 130" stroke-width="2.6"/>
+        </svg>`,
+        svg: `<svg viewBox="0 0 600 680" preserveAspectRatio="none" fill="none" style="width:100%;height:100%;filter:drop-shadow(0 1px 0 rgba(255,246,226,0.35)) drop-shadow(0 0 3px rgba(60,32,12,0.35));">${buildMarquetryInner()}</svg>`
+      },
+      maple: {
+        nameRu: 'Светлый клён',
+        nameEn: 'Light Maple',
+        bg: 'repeating-linear-gradient(90deg, rgba(130, 90, 45, 0.08) 0px, rgba(130, 90, 45, 0.08) 2px, transparent 2px, transparent 10px), radial-gradient(ellipse at center, #d9bc8c 0%, #bd9a62 70%, #9b7945 100%)',
+        svg: `<svg viewBox="0 0 200 200" fill="none" stroke="#241106" stroke-width="2">
+          <circle cx="100" cy="100" r="56"/>
+          <circle cx="100" cy="100" r="32"/>
+          <path d="M100 22 C112 65 135 88 178 100 C135 112 112 135 100 178 C88 135 65 112 22 100 C65 88 88 65 100 22 Z"/>
+          <path d="M100 22 C112 65 135 88 178 100 C135 112 112 135 100 178 C88 135 65 112 22 100 C65 88 88 65 100 22 Z" transform="rotate(45 100 100)"/>
+        </svg>`
+      }
+    };
+
+    /**
+     * Звезда с заострёнными «арочными» зубцами (для маркетри-медальона).
+     */
+    function starPath(cx, cy, rOut, rIn, n, rot) {
+      let d = '';
+      for (let i = 0; i < n * 2; i++) {
+        const r = i % 2 === 0 ? rOut : rIn;
+        const a = (Math.PI * i) / n + rot;
+        d += (i === 0 ? 'M' : 'L') + (cx + r * Math.cos(a)).toFixed(1) + ',' + (cy + r * Math.sin(a)).toFixed(1);
+      }
+      return d + 'Z';
+    }
+
+    /**
+     * Маркетри-вставка на пуанте: вытянутый лист-ромб с розеткой в центре.
+     * dir = 1 — остриё вниз (верхний ряд), dir = -1 — остриё вверх (нижний ряд).
+     */
+    function inlayLeaf(x, yBase, len, dir, ink, inkSoft) {
+      const I = ink || '#170c04';
+      const IS = inkSoft || 'rgba(23,12,4,0.85)';
+      const yEnd = yBase + dir * len;
+      const cy = yBase + dir * len * 0.26;
+      const leaf = `M ${x} ${yBase} C ${x + 30} ${yBase + dir * 8} ${x + 27} ${yBase + dir * 40} ${x + 20} ${yBase + dir * 75} C ${x + 14} ${yBase + dir * 110} ${x + 6} ${yEnd - dir * 8} ${x} ${yEnd} C ${x - 6} ${yEnd - dir * 8} ${x - 14} ${yBase + dir * 110} ${x - 20} ${yBase + dir * 75} C ${x - 27} ${yBase + dir * 40} ${x - 30} ${yBase + dir * 8} ${x} ${yBase} Z`;
+      const rosette = starPath(x, cy, 15, 5.5, 4, -Math.PI / 2);
+      return `<path d="${leaf}" fill="${IS}" stroke="${I}" stroke-width="2.5"/>
+              <path d="${rosette}" fill="none" stroke="${I}" stroke-width="2"/>
+              <circle cx="${x}" cy="${cy}" r="3.5" fill="${I}"/>`;
+    }
+
+    /**
+     * Полотно в стиле «Маркетри»: вставки на всех пуантах, точечные линии
+     * между колонками и арочный паутино-медальон с пауком в центре.
+     * viewBox 0 0 600 680, preserveAspectRatio="none" — тянется на всё поле.
+     */
+    function buildMarquetryInner() {
+      const INK = '#2a1708';
+      const INK_SOFT = 'rgba(42, 23, 8, 0.72)';
+      const centers = [50, 150, 250, 350, 450, 550];
+      let d = '';
+      // Вставки на верхних и нижних пуантах
+      centers.forEach(x => {
+        d += inlayLeaf(x, 52, 140, 1, INK, INK_SOFT);
+        d += inlayLeaf(x, 628, 140, -1, INK, INK_SOFT);
+      });
+      // Точечные линии между колонками (внутренние + крайние зазоры)
+      [25, 100, 200, 300, 400, 500, 575].forEach(x => {
+        d += `<line x1="${x}" y1="200" x2="${x}" y2="228" stroke="${INK}" stroke-width="3" stroke-linecap="round" stroke-dasharray="0.1 9" opacity="0.55"/>`;
+        d += `<line x1="${x}" y1="452" x2="${x}" y2="480" stroke="${INK}" stroke-width="3" stroke-linecap="round" stroke-dasharray="0.1 9" opacity="0.55"/>`;
+      });
+      // Центральное арочное медальон-полотно (вложенный SVG с сохранением пропорций)
+      const cx = 135, cy = 135;
+      let medal = '';
+      // 8 тёмных «дуг паутины» в выемках звезды
+      for (let k = 0; k < 8; k++) {
+        const a = -Math.PI / 2 + (k * Math.PI) / 4;
+        const p = (r, ang) => `${(cx + r * Math.cos(ang)).toFixed(1)},${(cy + r * Math.sin(ang)).toFixed(1)}`;
+        medal += `<path d="M ${p(118, a)} L ${p(86, a + Math.PI / 8)} L ${p(54, a)} L ${p(86, a - Math.PI / 8)} Z" fill="rgba(42,23,8,0.42)"/>`;
+      }
+      medal += `<path d="${starPath(cx, cy, 118, 86, 8, -Math.PI / 2)}" fill="none" stroke="${INK}" stroke-width="2.6"/>`;
+      medal += `<path d="${starPath(cx, cy, 78, 52, 8, -Math.PI / 2 + Math.PI / 8)}" fill="none" stroke="${INK}" stroke-width="2.1" opacity="0.85"/>`;
+      // Перечные лучи от кольца к вершинам
+      for (let k = 0; k < 8; k++) {
+        const a = -Math.PI / 2 + (k * Math.PI) / 4;
+        medal += `<line x1="${(cx + 46 * Math.cos(a)).toFixed(1)}" y1="${(cy + 46 * Math.sin(a)).toFixed(1)}" x2="${(cx + 114 * Math.cos(a)).toFixed(1)}" y2="${(cy + 114 * Math.sin(a)).toFixed(1)}" stroke="${INK}" stroke-width="1.8" opacity="0.85"/>`;
+      }
+      medal += `<circle cx="${cx}" cy="${cy}" r="44" fill="none" stroke="${INK}" stroke-width="2.2"/>`;
+      // Бусины на внутренних дугах
+      for (let k = 0; k < 8; k++) {
+        const a = -Math.PI / 2 + Math.PI / 8 + (k * Math.PI) / 4;
+        medal += `<circle cx="${(cx + 86 * Math.cos(a)).toFixed(1)}" cy="${(cy + 86 * Math.sin(a)).toFixed(1)}" r="2.8" fill="${INK}" opacity="0.85"/>`;
+      }
+      // Скрещенные пистолеты (Кольт 1911) стволами вверх, как на скриншоте
+      const pistol = `<g stroke="${INK}" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Затвор и ствол -->
+        <path d="M-24 -7 L30 -7 L32 -4 L32 3 L-24 3 Z" fill="#e5d4b3" stroke-width="2.2"/>
+        <path d="M-24 -7 L30 -7 L32 -4 L-24 -4 Z" fill="${INK}"/>
+        <path d="M24 -9 L28 -9 L28 -7 L24 -7 Z" fill="${INK}"/>
+        <!-- Насечки на затворе -->
+        <path d="M-20 -4 V2 M-17 -4 V2 M-14 -4 V2 M-11 -4 V2 M-8 -4 V2" stroke-width="1.3"/>
+        <!-- Курок и бобровый хвост -->
+        <path d="M-24 -3 L-31 -6 L-27 -1 Z" fill="${INK}"/>
+        <path d="M-24 2 Q-32 4 -29 9 Q-24 8 -20 6 Z" fill="${INK}"/>
+        <!-- Рамка и спусковая скоба -->
+        <path d="M-22 3 L12 3 L12 7 L-6 7 L-10 26 L-24 26 Z" fill="#cbb58e" stroke-width="1.8"/>
+        <path d="M-3 7 Q5 7 5 14 Q5 19 -5 18" fill="none" stroke-width="2.2"/>
+        <path d="M-1 9 Q1 13 -2 16" fill="none" stroke-width="1.5"/>
+        <!-- Рукоять с накладкой и винтами -->
+        <path d="M-22 6 L-9 6 L-12 29 Q-13 33 -18 33 L-26 31 Z" fill="${INK}" stroke-width="1.8"/>
+        <circle cx="-16" cy="12" r="1.4" fill="#e5d4b3" stroke="none"/>
+        <circle cx="-18" cy="27" r="1.4" fill="#e5d4b3" stroke="none"/>
+      </g>`;
+      medal += `<g transform="translate(${cx - 8},${cy + 2}) scale(1.4) rotate(-38)">${pistol}</g>`;
+      medal += `<g transform="translate(${cx + 8},${cy + 2}) scale(-1.4,1.4) rotate(-38)">${pistol}</g>`;
+      d += `<svg x="110" y="205" width="380" height="270" viewBox="0 0 270 270" preserveAspectRatio="none">${medal}</svg>`;
+      return d;
+    }
+
+    let currentTheme = 'spider';
+
+    function applyBoardTheme(key) {
+      const theme = BOARD_THEMES[key] || BOARD_THEMES.spider;
+      currentTheme = key;
+      document.querySelectorAll('.board-half').forEach(half => {
+        half.style.background = theme.bg;
+        half.dataset.theme = key;
+      });
+      document.querySelectorAll('.board-art').forEach(art => {
+        art.innerHTML = theme.svg;
+        if (theme.fullBoard) {
+          art.style.mixBlendMode = 'multiply';
+          art.style.opacity = '0.95';
+        } else {
+          art.style.mixBlendMode = 'multiply';
+          art.style.opacity = key === 'maple' ? '0.68' : '0.78';
+        }
+      });
+      renderThemeGrid();
+    }
+
+    function renderThemeGrid() {
+      const grid = byId('theme-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      Object.entries(BOARD_THEMES).forEach(([key, theme]) => {
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'theme-card' + (currentTheme === key ? ' active' : '');
+        card.innerHTML = `
+          <div class="theme-preview" style="background: ${theme.bg};">${theme.previewSvg || theme.svg}</div>
+          <span>${lang === 'ru' ? theme.nameRu : theme.nameEn}</span>
+        `;
+        card.addEventListener('click', () => applyBoardTheme(key));
+        grid.appendChild(card);
+      });
+    }
+
+    const modalCosmetics = byId('modal-cosmetics');
+    byId('btn-cosmetics').addEventListener('click', () => {
+      renderThemeGrid();
+      modalCosmetics.classList.remove('hidden');
+    });
+    byId('btn-close-cosmetics').addEventListener('click', () => modalCosmetics.classList.add('hidden'));
+    modalCosmetics.addEventListener('click', e => { if (e.target === modalCosmetics) modalCosmetics.classList.add('hidden'); });
+
+    applyBoardTheme(currentTheme);
+  </script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5e09909ae47623e',t:'MTc5NTI3MzU4MQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5e09909ae47623e',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
