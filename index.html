@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Нарды: Паук — Коллекционное издание</title>
+  <title>Нарды: Классик — Коллекционное издание</title>
   <style>
     :root {
       --bg-dark: #0c0907;
@@ -77,6 +77,29 @@
       display: flex;
       align-items: center;
       gap: 10px;
+    }
+
+    /* Название игры над кнопками в шапке */
+    .game-title {
+      width: 100%;
+      text-align: center;
+      font-size: 1.35rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+      color: var(--gold-light);
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
+      margin-bottom: 8px;
+    }
+
+    .top-bar { flex-wrap: wrap; }
+
+    /* Кнопка «Новая игра» в шапке вместо названия */
+    .brand-btn {
+      font-size: 1rem;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      padding: 9px 18px;
+      white-space: nowrap;
     }
 
     .btn {
@@ -194,8 +217,9 @@
     .board-frame {
       position: relative;
       width: 100%;
-      aspect-ratio: 16 / 10;
-      max-height: 70vh;
+      max-width: 760px;
+      aspect-ratio: 1 / 1;
+      max-height: 72vh;
       background-color: #3a2617;
       background-image:
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Cpath d='M0 6h30v24H6V12h18v12H12v-6h6' fill='none' stroke='%231b1008' stroke-width='2.2' stroke-opacity='0.55'/%3E%3C/svg%3E"),
@@ -203,7 +227,7 @@
       background-repeat: repeat, no-repeat;
       background-size: 26px 26px, cover;
       border-radius: 16px;
-      padding: 28px;
+      padding: 18px;
       box-shadow:
         0 25px 60px rgba(0, 0, 0, 0.85),
         inset 0 2px 4px rgba(255, 230, 170, 0.2),
@@ -215,12 +239,12 @@
 
     /* Узор между рельсами и полями: цельный мотив расположен по центру каждой полосы. */
     .ornament-gutter {
-      flex: 0 0 32px;
+      flex: 0 0 10px;
       align-self: stretch;
       background-image:
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 26 26'%3E%3Cpath d='M0 4h22v18H4V8h14v10H8v-6h6' fill='none' stroke='%231b1008' stroke-width='2.2' stroke-opacity='0.65'/%3E%3C/svg%3E"),
         linear-gradient(90deg, #2b1b10, #49301d 50%, #2b1b10);
-      background-size: 26px 26px, cover;
+      background-size: 10px 10px, cover;
       background-position: center top, center;
       background-repeat: repeat-y, no-repeat;
       pointer-events: none;
@@ -261,7 +285,8 @@
 
     /* Бар (перегородка посередине) */
     .bar {
-      width: 44px;
+      flex: 0 0 30px;
+      width: 30px;
       background: var(--wood-inner);
       border-radius: 6px;
       box-shadow:
@@ -330,6 +355,19 @@
       filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
     }
 
+    /* В теме Паутина треугольники короче, чтобы открывать рисунок поля */
+    .board-half[data-theme="spider"] .point::before {
+      left: 8%;
+      right: 8%;
+      height: 58%;
+    }
+
+    /* В теме Паутина рисунок паука и паутины в центре крупнее */
+    .board-half[data-theme="spider"] .board-art svg {
+      width: 82%;
+      height: 82%;
+    }
+
     .row.top .point::before {
       top: 0;
       clip-path: polygon(0 0, 100% 0, 50% 100%);
@@ -357,33 +395,95 @@
       filter: none;
     }
 
-    /* Подсветка доступных ходов */
+    /* В теме Кельтский узор: цепочка из 4 шаров и острый треугольник с вырезом у основания */
+    .board-half[data-theme="celtic"] .point.light::before,
+    .board-half[data-theme="celtic"] .point.dark::before {
+      background-color: transparent;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 300' preserveAspectRatio='none'%3E%3Ccircle cx='50' cy='24' r='16' fill='%23160c06'/%3E%3Ccircle cx='50' cy='50' r='13' fill='%23160c06'/%3E%3Ccircle cx='50' cy='72' r='10' fill='%23160c06'/%3E%3Ccircle cx='50' cy='90' r='7' fill='%23160c06'/%3E%3Cpath d='M22 104 L50 132 L78 104 L50 286 Z' fill='%23160c06'/%3E%3C/svg%3E");
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      clip-path: none !important;
+      filter: none;
+      opacity: 0.92;
+    }
+    .board-half[data-theme="celtic"] .row.bottom .point::before {
+      transform: scaleY(-1);
+    }
+
+    /* Тема Имперский герб: чередование чёрных и белых орнаментальных «флёронов» */
+    .board-half[data-theme="imperial"] .point.dark::before {
+      background-color: transparent;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 300' preserveAspectRatio='none'%3E%3Cg fill='%2314100c'%3E%3Cpath d='M50 6 C62 20 70 34 60 46 C70 44 78 50 76 60 C66 56 56 60 50 70 C44 60 34 56 24 60 C22 50 30 44 40 46 C30 34 38 20 50 6 Z'/%3E%3Ccircle cx='28' cy='34' r='6'/%3E%3Ccircle cx='72' cy='34' r='6'/%3E%3Cpath d='M34 76 C40 70 60 70 66 76 L62 84 L38 84 Z'/%3E%3Cpath d='M46 84 H54 L52 110 H48 Z'/%3E%3Cpath d='M34 104 C42 98 58 98 66 104 L62 112 L38 112 Z'/%3E%3Cpath d='M44 112 H56 L56 136 L44 136 Z'/%3E%3Cpath d='M38 136 H62 L50 182 Z'/%3E%3Cpath d='M47 182 H53 L52 240 H48 Z'/%3E%3Cpath d='M50 240 L56 262 L50 290 L44 262 Z'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      clip-path: none !important;
+      filter: none;
+      opacity: 0.92;
+    }
+    .board-half[data-theme="imperial"] .point.light::before {
+      background-color: transparent;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 300' preserveAspectRatio='none'%3E%3Cg fill='%23f5eedc' stroke='%234a2a0c' stroke-width='2'%3E%3Cpath d='M50 6 C62 20 70 34 60 46 C70 44 78 50 76 60 C66 56 56 60 50 70 C44 60 34 56 24 60 C22 50 30 44 40 46 C30 34 38 20 50 6 Z'/%3E%3Ccircle cx='28' cy='34' r='6'/%3E%3Ccircle cx='72' cy='34' r='6'/%3E%3Cpath d='M34 76 C40 70 60 70 66 76 L62 84 L38 84 Z'/%3E%3Cpath d='M46 84 H54 L52 110 H48 Z'/%3E%3Cpath d='M34 104 C42 98 58 98 66 104 L62 112 L38 112 Z'/%3E%3Cpath d='M44 112 H56 L56 136 L44 136 Z'/%3E%3Cpath d='M38 136 H62 L50 182 Z'/%3E%3Cpath d='M47 182 H53 L52 240 H48 Z'/%3E%3Cpath d='M50 240 L56 262 L50 290 L44 262 Z'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      clip-path: none !important;
+      filter: none;
+      opacity: 0.95;
+    }
+    .board-half[data-theme="imperial"] .row.bottom .point::before {
+      transform: scaleY(-1);
+    }
+
+    /* Тема Морской: выжженные якоря с канатом на пунктах */
+    .board-half[data-theme="nautical"] .point.light::before,
+    .board-half[data-theme="nautical"] .point.dark::before {
+      background-color: transparent;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 300' preserveAspectRatio='none'%3E%3Cg fill='none' stroke='%23160c06' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='50' cy='24' r='9'/%3E%3Cline x1='50' y1='33' x2='50' y2='145'/%3E%3Cline x1='32' y1='52' x2='68' y2='52'/%3E%3Cpath d='M22 108 C22 142 78 142 78 108'/%3E%3Cpath d='M16 114 L22 102 L30 112'/%3E%3Cpath d='M84 114 L78 102 L70 112'/%3E%3Cpath d='M42 40 C66 55 34 85 58 105 C66 114 48 126 38 120' stroke-width='2.8'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      clip-path: none !important;
+      filter: none;
+      opacity: 0.9;
+    }
+    .board-half[data-theme="nautical"] .row.bottom .point::before {
+      transform: scaleY(-1);
+    }
+
+    /* Подсветка доступных ходов — укороченный столб, плавно растворяющийся к концу */
     .point.valid-target::after {
       content: '';
       position: absolute;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: var(--highlight-move);
+      left: 2px;
+      right: 2px;
+      height: 62%;
+      border-radius: 8px;
       border: 2px solid var(--gold-light);
-      box-shadow: 0 0 14px var(--gold);
-      z-index: 5;
+      box-shadow: inset 0 0 12px rgba(255, 226, 128, 0.28);
+      z-index: 2;
       pointer-events: none;
-      animation: pulse 1.2s infinite ease-in-out;
+      animation: target-cell-pulse 1.2s infinite ease-in-out;
+    }
+    .row.top .point.valid-target::after {
+      top: 2px;
+      background: linear-gradient(180deg, rgba(255, 224, 112, 0.38) 0%, rgba(212, 175, 55, 0.14) 55%, rgba(212, 175, 55, 0) 100%);
+      -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 45%, transparent 100%);
+      mask-image: linear-gradient(180deg, #000 0%, #000 45%, transparent 100%);
+    }
+    .row.bottom .point.valid-target::after {
+      bottom: 2px;
+      background: linear-gradient(0deg, rgba(255, 224, 112, 0.38) 0%, rgba(212, 175, 55, 0.14) 55%, rgba(212, 175, 55, 0) 100%);
+      -webkit-mask-image: linear-gradient(0deg, #000 0%, #000 45%, transparent 100%);
+      mask-image: linear-gradient(0deg, #000 0%, #000 45%, transparent 100%);
     }
 
-    .row.top .point.valid-target::after { bottom: 6px; }
-    .row.bottom .point.valid-target::after { top: 6px; }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(0.9); opacity: 0.8; }
-      50% { transform: scale(1.15); opacity: 1; }
+    @keyframes target-cell-pulse {
+      0%, 100% { opacity: 0.68; }
+      50% { opacity: 1; }
     }
 
     /* Шашки */
     .checker {
       width: 78%;
-      max-width: 46px;
+      max-width: var(--checker-max-diameter, 46px);
       aspect-ratio: 1 / 1;
       border-radius: 50%;
       position: relative;
@@ -574,7 +674,8 @@
       display: flex;
       justify-content: center;
       gap: 12px;
-      padding: 14px 16px;
+      margin-top: 32px;
+      padding: 18px 16px 14px;
       flex-wrap: wrap;
     }
 
@@ -618,6 +719,17 @@
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(212, 175, 55, 0.15);
     }
 
+    @media (min-width: 721px) {
+      .modal-card.menu-card {
+        max-width: 640px;
+        padding: 38px 40px;
+        font-size: 1.06rem;
+      }
+      .modal-card.menu-card #menu-title { font-size: 2.1rem !important; }
+      .modal-card.menu-card .diff-btn,
+      .modal-card.menu-card .btn { font-size: 1.1rem; padding-top: 14px; padding-bottom: 14px; }
+    }
+
     .modal-card h1, .modal-card h2 {
       color: var(--gold-light);
       margin-top: 0;
@@ -637,6 +749,32 @@
       margin-top: 20px;
     }
 
+    .difficulty-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .diff-btn {
+      padding: 8px 6px;
+      font-size: 0.85rem;
+      background: rgba(20, 15, 10, 0.85);
+      border: 1px solid var(--gold-dark);
+      color: var(--text-muted);
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .diff-btn.active {
+      background: linear-gradient(180deg, #8a6d1c 0%, #5c450d 100%);
+      color: #fff8e7;
+      border-color: var(--gold);
+      font-weight: bold;
+    }
+
     .menu-buttons .btn {
       padding: 12px;
       font-size: 1rem;
@@ -645,10 +783,21 @@
     .rules-list {
       text-align: left;
       color: var(--text-main);
-      font-size: 0.9rem;
-      line-height: 1.5;
-      padding-left: 18px;
+      font-size: 0.95rem;
+      line-height: 1.65;
+      padding-left: 20px;
       margin: 14px 0;
+      max-height: 55vh;
+      overflow-y: auto;
+    }
+
+    .rules-list li {
+      padding: 10px 4px;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.22);
+    }
+
+    .rules-list li:last-child {
+      border-bottom: none;
     }
 
     /* Сетка выбора тем (Косметика) */
@@ -701,6 +850,39 @@
       height: 40px;
     }
 
+    /* Заголовок секции внутри модального окна «Косметика» */
+    .section-title {
+      margin: 18px 0 6px;
+      text-align: center;
+      font-size: 0.82rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: normal;
+    }
+
+    .skin-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .skin-preview {
+      width: 100%;
+      height: 52px;
+      border-radius: 6px;
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      background:
+        radial-gradient(ellipse at center, #4b3321 0%, #342114 65%, #23150c 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .skin-preview .checker-icon {
+      width: 26px;
+      height: 26px;
+    }
+
     /* Выбор коротких и длинных нард в том же коллекционном стиле */
     .modal-card {
       max-height: calc(100dvh - 32px);
@@ -731,8 +913,12 @@
       background: linear-gradient(145deg, #2d2117, #1b140e);
       color: var(--text-main);
       font-family: inherit;
-      text-align: left;
+      text-align: center;
       cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       box-shadow: inset 0 1px 0 #ffffff08, 0 5px 12px #0003;
       transition: border-color .2s, background .2s, box-shadow .2s;
     }
@@ -746,7 +932,7 @@
       outline: 2px solid var(--gold-light);
       outline-offset: 4px;
     }
-    .variant-mini { width: 120px; max-width: 84%; height: 52px; display: block; margin: 0 0 12px; opacity: .75; }
+    .variant-mini { width: 132px; max-width: 88%; height: 58px; display: block; margin: 0 auto 12px; opacity: .75; }
     .is-selected .variant-mini { opacity: 1; }
     .variant-name { display: block; color: #ead5ad; font-size: 1rem; font-weight: bold; }
     .variant-caption { display: block; color: #ac9679; font-size: .75rem; line-height: 1.4; margin-top: 6px; }
@@ -766,7 +952,7 @@
     }
     .modal-card .variant-description {
       margin: 13px 0 0; min-height: 2.8em;
-      text-align: left; font-size: .8rem; line-height: 1.5; color: #bba387;
+      text-align: center; font-size: .8rem; line-height: 1.5; color: #bba387;
     }
     .menu-buttons { margin-top: 18px; gap: 10px; }
     .btn-resume { border-color: #645039; color: #b8a68a; background: transparent; box-shadow: none; }
@@ -785,6 +971,7 @@
                   linear-gradient(90deg, #554021, #ab8e4c 44%, #493417 51%, #9b7a3a 60%, #574023);
       border: 1px solid #352511; border-radius: 3px;
       box-shadow: inset 0 1px 1px #e8d39b55, 0 3px 5px #0009;
+      pointer-events: none;
     }
     .bar::before { top: 19%; }
     .bar::after { bottom: 19%; }
@@ -792,7 +979,9 @@
     .dice-area.is-double .die { width: 36px; height: 36px; padding: 4px; }
     [hidden] { display: none !important; }
     @media (max-width: 440px) {
-      .menu-card { padding: 24px 18px; }
+      /* Оставляем отдельную верхнюю строку для переключателя языка. */
+      #modal-menu .menu-card { padding: 66px 18px 24px; }
+      #modal-menu .menu-card h1 { margin-top: 0; }
       .variant-options { gap: 9px; }
       .variant-option { padding: 12px 10px; }
       .variant-name { font-size: .88rem; }
@@ -808,30 +997,63 @@
       .dice-area.is-double .pip { width: 4px; height: 4px; }
     }
 
-    /* Адаптивность для мобильных */
+    /* На телефонах вытягиваем поле вверх и отдаём больше ширины пунктам. */
     @media (max-width: 720px) {
+      .board-wrapper { padding: 0 2px; }
       .board-frame {
-        padding: 8px;
+        padding: 6px 4px;
         gap: 0;
-        aspect-ratio: 4 / 3;
+        aspect-ratio: 1 / 1;
+        max-height: 66vh;
       }
-      .ornament-gutter { flex-basis: 6px; background-size: 6px 6px, cover; }
-      .bar { width: 28px; }
-      .bear-off-zone { width: 34px; }
-      .die { width: 32px; height: 32px; padding: 4px; }
+      .ornament-gutter { flex-basis: 3px; background-size: 3px 3px, cover; }
+      .bar { flex-basis: 16px; width: 16px; }
+      .bar-slot { width: calc(100% + 12px); }
+      .point, .bar-slot, .bear-off-tray { touch-action: manipulation; }
+      .die { width: 34px; height: 34px; padding: 4px; }
       .pip { width: 5px; height: 5px; }
-      .checker { width: 86%; }
       .brand { font-size: 1rem; }
-      .hud { padding: 4px 10px 8px; }
-      .player-card { padding: 6px 10px; }
+      .top-bar { justify-content: center; flex-wrap: wrap; gap: 8px; padding: 8px 10px; }
+      .game-title { font-size: 1.05rem; letter-spacing: 1.5px; margin-bottom: 6px; }
+      .top-controls { justify-content: center; gap: 8px; }
+      .top-bar .btn { padding: 7px 11px; font-size: 0.82rem; }
+      .skin-grid { grid-template-columns: repeat(2, 1fr); }
+      .hud {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        padding: 4px 10px 8px;
+      }
+      .player-card { padding: 6px 8px; gap: 6px; min-width: 0; }
+      .player-info { min-width: 0; }
+      .player-name { font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .bear-off-count { font-size: 0.72rem; }
+      .turn-info { grid-column: 1 / -1; order: 3; min-width: 0; }
+      .status-banner { font-size: 0.9rem; }
+    }
+
+    /* В альбомной ориентации не растягиваем доску на несколько экранов. */
+    @media (max-width: 720px) and (orientation: landscape) {
+      .board-frame { aspect-ratio: 4 / 3; }
+    }
+
+    @media (max-width: 360px) {
+      .top-bar { padding: 8px 10px; gap: 6px; }
+      .brand { gap: 6px; font-size: 0.9rem; letter-spacing: 0.4px; }
+      .brand svg { width: 22px; height: 22px; flex-shrink: 0; }
+      .brand-btn { font-size: 0.8rem; padding: 8px 10px; }
+      .top-controls { gap: 6px; }
+      .top-controls .btn { padding: 8px; font-size: 0.78rem; white-space: nowrap; }
+      .player-card { padding-inline: 6px; }
     }
 
     /* ===== Резные 3D-выемки ===== */
     /* Диаметр шашки и геометрия её лунки используют одни и те же размеры.
        syncCheckerSeats() подгоняет круглые вырезы при изменении ширины доски. */
     .board-half {
-      --checker-width-ratio: 0.78;
-      --checker-seat-inset: 10px;
+      --checker-width-ratio: 0.96;
+      --checker-max-diameter: 64px;
+      --checker-seat-inset: 8px;
       padding: 0;
       min-width: 0;
     }
@@ -869,7 +1091,8 @@
     /* Боковые рельсы с длинными выемками (как вырезано в раме) */
     .side-rail,
     .bear-off-zone {
-      width: 46px;
+      flex: 0 0 30px;
+      width: 30px;
       background:
         repeating-linear-gradient(0deg, rgba(0,0,0,0.07) 0 2px, transparent 2px 8px),
         linear-gradient(90deg, #3e2817, #573a22 50%, #3e2817);
@@ -926,11 +1149,28 @@
 
     @media (max-width: 720px) {
       .board-half {
-        --checker-width-ratio: 0.86;
-        --checker-seat-inset: 6px;
+        --checker-width-ratio: 0.99;
+        --checker-max-diameter: 64px;
+        --checker-seat-inset: 5px;
       }
-      .side-rail, .bear-off-zone { width: 26px; padding: 6px 4px; }
-      .rail-hole { width: 12px; height: 12px; }
+      .side-rail, .bear-off-zone { flex-basis: 16px; width: 16px; padding: 6px 2px; }
+      .rail-hole { width: 10px; height: 10px; }
+    }
+    /* Пропорциональное увеличение доски и шашек только для ПК */
+    @media (min-width: 1025px) {
+      .top-bar,
+      .hud,
+      .board-wrapper,
+      .action-bar {
+        max-width: 1200px;
+      }
+      .board-frame {
+        max-width: 960px;
+        max-height: 78vh;
+      }
+      .checker {
+        max-width: 68px;
+      }
     }
   </style>
 </head>
@@ -938,17 +1178,11 @@
 
   <!-- Верхняя панель -->
   <header class="top-bar">
-    <div class="brand">
-      <!-- Медальон Волка (SVG) -->
-      <svg viewBox="0 0 64 64" aria-hidden="true">
-        <path d="M32 4L14 18l-8 14 10 12 4 14 12-6 12 6 4-14 10-12-8-14L32 4zm0 10l10 10-4 8h-12l-4-8 10-10zm-11 22l5 4-2 6-5-4 2-6zm22 0l2 6-5 4-2-6 5-4z"/>
-      </svg>
-      <span data-i18n="title">Ведьмак: Нарды</span>
-    </div>
+    <div class="game-title" data-i18n="menuTitle">Нарды: Классик</div>
+    <button class="btn btn-primary brand-btn" id="btn-new-top" data-i18n="newGame">Новая игра</button>
     <div class="top-controls">
       <button class="btn" id="btn-cosmetics" data-i18n="cosmetics">Косметика</button>
       <button class="btn" id="btn-menu" data-i18n="menu">Меню</button>
-      <button class="btn" id="btn-lang" aria-label="Переключить язык">EN</button>
     </div>
   </header>
 
@@ -989,7 +1223,7 @@
       <div class="ornament-gutter" aria-hidden="true"></div>
 
       <!-- Левая половина -->
-      <div class="board-half">
+      <div class="board-half" data-theme="spider">
         <div class="carve-ledge top" aria-hidden="true">
           <svg viewBox="0 0 600 40" preserveAspectRatio="none">
             <defs>
@@ -1019,16 +1253,19 @@
           </svg>
         </div>
         <div class="board-art" aria-hidden="true">
-          <svg viewBox="0 0 200 200" fill="none" stroke="#e5cca0" stroke-width="1.6">
-            <path d="M100 10 L100 190 M10 100 L190 100 M36 36 L164 164 M164 36 L36 164"/>
-            <polygon points="100,25 153,47 175,100 153,153 100,175 47,153 25,100 47,47"/>
-            <polygon points="100,50 135,65 150,100 135,135 100,150 65,135 50,100 65,65"/>
+          <svg viewBox="0 0 200 200" fill="none" stroke="#1d0e05" stroke-width="1.6">
+            <path d="M100 6 L100 194 M6 100 L194 100 M33 33 L167 167 M167 33 L33 167"/>
+            <polygon points="100,14 161,39 186,100 161,161 100,186 39,161 14,100 39,39"/>
+            <polygon points="100,36 145,55 164,100 145,145 100,164 55,145 36,100 55,55"/>
+            <polygon points="100,56 131,69 144,100 131,131 100,144 69,131 56,100 69,69"/>
             <polygon points="100,74 118,82 126,100 118,118 100,126 82,118 74,100 82,82"/>
-            <!-- Паук -->
-            <ellipse cx="100" cy="108" rx="11" ry="15" fill="#e5cca0"/>
-            <circle cx="100" cy="88" r="7" fill="#e5cca0"/>
-            <path d="M93 88 Q75 72 68 85 M93 93 Q72 92 66 105 M93 98 Q74 112 72 126 M94 104 Q80 124 82 138" stroke-width="2.2"/>
-            <path d="M107 88 Q125 72 132 85 M107 93 Q128 92 134 105 M107 98 Q126 112 128 126 M106 104 Q120 124 118 138" stroke-width="2.2"/>
+            <!-- Паук-крестовик -->
+            <ellipse cx="100" cy="110" rx="13.5" ry="18.5" fill="#1d0e05"/>
+            <circle cx="100" cy="84" r="8.5" fill="#1d0e05"/>
+            <path d="M100 102 V118 M94 108 H106" stroke="#4b3321" stroke-width="2" stroke-linecap="round"/>
+            <path d="M97 77 L95 71 M103 77 L105 71" stroke="#1d0e05" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M91 84 Q68 64 60 79 M91 90 Q64 88 56 104 M92 98 Q66 116 64 132 M93 106 Q74 130 76 146" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M109 84 Q132 64 140 79 M109 90 Q136 88 144 104 M108 98 Q134 116 136 132 M107 106 Q126 130 124 146" stroke-width="2.4" stroke-linecap="round"/>
           </svg>
         </div>
         <div class="row top" id="row-top-left"></div>
@@ -1046,7 +1283,7 @@
       <div class="ornament-gutter" aria-hidden="true"></div>
 
       <!-- Правая половина -->
-      <div class="board-half">
+      <div class="board-half" data-theme="spider">
         <div class="carve-ledge top" aria-hidden="true">
           <svg viewBox="0 0 600 40" preserveAspectRatio="none">
             <defs>
@@ -1076,16 +1313,19 @@
           </svg>
         </div>
         <div class="board-art" aria-hidden="true">
-          <svg viewBox="0 0 200 200" fill="none" stroke="#e5cca0" stroke-width="1.6">
-            <path d="M100 10 L100 190 M10 100 L190 100 M36 36 L164 164 M164 36 L36 164"/>
-            <polygon points="100,25 153,47 175,100 153,153 100,175 47,153 25,100 47,47"/>
-            <polygon points="100,50 135,65 150,100 135,135 100,150 65,135 50,100 65,65"/>
+          <svg viewBox="0 0 200 200" fill="none" stroke="#1d0e05" stroke-width="1.6">
+            <path d="M100 6 L100 194 M6 100 L194 100 M33 33 L167 167 M167 33 L33 167"/>
+            <polygon points="100,14 161,39 186,100 161,161 100,186 39,161 14,100 39,39"/>
+            <polygon points="100,36 145,55 164,100 145,145 100,164 55,145 36,100 55,55"/>
+            <polygon points="100,56 131,69 144,100 131,131 100,144 69,131 56,100 69,69"/>
             <polygon points="100,74 118,82 126,100 118,118 100,126 82,118 74,100 82,82"/>
-            <!-- Паук -->
-            <ellipse cx="100" cy="108" rx="11" ry="15" fill="#e5cca0"/>
-            <circle cx="100" cy="88" r="7" fill="#e5cca0"/>
-            <path d="M93 88 Q75 72 68 85 M93 93 Q72 92 66 105 M93 98 Q74 112 72 126 M94 104 Q80 124 82 138" stroke-width="2.2"/>
-            <path d="M107 88 Q125 72 132 85 M107 93 Q128 92 134 105 M107 98 Q126 112 128 126 M106 104 Q120 124 118 138" stroke-width="2.2"/>
+            <!-- Паук-крестовик -->
+            <ellipse cx="100" cy="110" rx="13.5" ry="18.5" fill="#1d0e05"/>
+            <circle cx="100" cy="84" r="8.5" fill="#1d0e05"/>
+            <path d="M100 102 V118 M94 108 H106" stroke="#4b3321" stroke-width="2" stroke-linecap="round"/>
+            <path d="M97 77 L95 71 M103 77 L105 71" stroke="#1d0e05" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M91 84 Q68 64 60 79 M91 90 Q64 88 56 104 M92 98 Q66 116 64 132 M93 106 Q74 130 76 146" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M109 84 Q132 64 140 79 M109 90 Q136 88 144 104 M108 98 Q134 116 136 132 M107 106 Q126 130 124 146" stroke-width="2.4" stroke-linecap="round"/>
           </svg>
         </div>
         <div class="row top" id="row-top-right"></div>
@@ -1111,15 +1351,16 @@
     <button class="btn btn-primary" id="btn-roll" data-i18n="roll">Бросить кубики</button>
     <button class="btn btn-primary" id="btn-end" data-i18n="endTurn" hidden>Завершить ход</button>
     <button class="btn" id="btn-undo" disabled data-i18n="undo">Отменить ход</button>
-    <button class="btn" id="btn-new" data-i18n="newGame">Новая игра</button>
   </footer>
 
   <!-- Главное меню -->
   <div class="modal-overlay" id="modal-menu" role="dialog" aria-modal="true" aria-labelledby="menu-title">
     <div class="modal-card menu-card" style="position: relative;">
-      <button class="btn" id="btn-lang-menu" type="button" style="position: absolute; top: 16px; right: 16px;">EN</button>
-      <h1 id="menu-title" data-i18n="menuTitle">Нарды</h1>
-      <p data-i18n="menuSubtitle">Коллекционное издание в стиле Ведьмака</p>
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:4px;">
+        <h1 id="menu-title" data-i18n="menuTitle" style="margin:0; font-size:clamp(1.15rem, 5.4vw, 1.85rem); text-align:left; line-height:1.15; min-width:0; overflow-wrap:anywhere;">Нарды: Классик</h1>
+        <button class="btn" id="btn-lang-menu" type="button" style="flex-shrink:0;">EN</button>
+      </div>
+      <p data-i18n="menuSubtitle">Коллекционное издание</p>
       <span class="variant-label" id="variant-label" data-i18n="variantLabel">Выберите вид игры</span>
       <div class="variant-options" role="radiogroup" aria-labelledby="variant-label">
         <button class="variant-option is-selected" type="button" role="radio" aria-checked="true" data-variant="short" tabindex="0" aria-describedby="variant-description">
@@ -1150,6 +1391,11 @@
         </button>
       </div>
       <p class="variant-description" id="variant-description">Классическая расстановка. Сбивайте блоты и возвращайте шашки с бара.</p>
+      <div class="difficulty-row" role="group" aria-label="Сложность ИИ">
+        <button class="diff-btn" type="button" data-diff="easy" data-i18n="diffEasy">Лёгкий</button>
+        <button class="diff-btn active" type="button" data-diff="medium" data-i18n="diffMedium">Средний</button>
+        <button class="diff-btn" type="button" data-diff="hard" data-i18n="diffHard">Сложный</button>
+      </div>
       <div class="menu-buttons">
         <button class="btn btn-primary" id="btn-mode-ai" data-i18n="playAI">Игра с ИИ</button>
         <button class="btn" id="btn-mode-pvp" data-i18n="playPVP">Игра на двоих</button>
@@ -1171,8 +1417,11 @@
   <!-- Косметика (выбор темы полотна) -->
   <div class="modal-overlay hidden" id="modal-cosmetics" role="dialog" aria-modal="true" aria-labelledby="cosmetics-title">
     <div class="modal-card">
-      <h2 id="cosmetics-title" data-i18n="cosmeticsTitle">Оформление полотна</h2>
+      <h2 id="cosmetics-title" data-i18n="cosmeticsTitle">Косметика</h2>
+      <h3 class="section-title" data-i18n="boardThemesTitle">Оформление полотна</h3>
       <div class="theme-grid" id="theme-grid"></div>
+      <h3 class="section-title" data-i18n="checkerStylesTitle">Стиль шашек</h3>
+      <div class="theme-grid skin-grid" id="checker-grid"></div>
       <button class="btn btn-primary" id="btn-close-cosmetics" data-i18n="close">Закрыть</button>
     </div>
   </div>
@@ -1190,16 +1439,17 @@
     /** Локализация: обе разновидности нард, RU / EN. */
     const I18N = {
       ru: {
-        title: 'Нарды: Паук', menu: 'Меню', cosmetics: 'Косметика', cosmeticsTitle: 'Оформление полотна',
+        title: 'Нарды: Классик', menu: 'Меню', cosmetics: 'Косметика', cosmeticsTitle: 'Косметика',
+        boardThemesTitle: 'Оформление полотна', checkerStylesTitle: 'Стиль шашек',
         whitePlayer: 'Белые (Игрок 1)', blackPlayerAI: 'Черные (ИИ)', blackPlayerP2: 'Черные (Игрок 2)',
         borneOff: 'Снято', roll: 'Бросить кубики', endTurn: 'Завершить ход',
         undo: 'Отменить ход', newGame: 'Новая игра',
-        menuTitle: 'Нарды: Паук', menuSubtitle: 'Коллекционное издание',
+        menuTitle: 'Нарды: Классик', menuSubtitle: 'Коллекционное издание',
         variantLabel: 'Выберите вид игры', shortName: 'Короткие нарды', longName: 'Длинные нарды',
         shortCaption: 'Взятие шашек · игра с баром', longCaption: 'Общее направление · без взятия',
         shortDescription: 'Классическая расстановка. Сбивайте блоты и возвращайте шашки с бара.',
         longDescription: 'Все 15 шашек начинают на голове. Пройдите круг к своему дому — без взятия и бара.',
-        newVariant: 'Новое', playAI: 'Игра с ИИ', playPVP: 'Игра на двоих',
+        newVariant: 'Новое', diffEasy: 'Лёгкий', diffMedium: 'Средний', diffHard: 'Сложный', playAI: 'Игра с ИИ', playPVP: 'Игра на двоих',
         rules: 'Правила', rulesTitleShort: 'Правила коротких нард', rulesTitleLong: 'Правила длинных нард',
         close: 'Закрыть', resume: 'Вернуться к партии', chooseMode: 'Выберите вид и режим игры',
         rollPrompt: 'Бросьте кубики', movePrompt: 'Ваш ход — выберите шашку', targetPrompt: 'Выберите подсвеченный пункт',
@@ -1230,15 +1480,16 @@
         ]
       },
       en: {
-        title: 'Backgammon', menu: 'Menu', cosmetics: 'Cosmetics', cosmeticsTitle: 'Board Themes',
+        title: 'Backgammon Classic', menu: 'Menu', cosmetics: 'Cosmetics', cosmeticsTitle: 'Cosmetics',
+        boardThemesTitle: 'Board Themes', checkerStylesTitle: 'Checker Style',
         whitePlayer: 'White (Player 1)', blackPlayerAI: 'Black (AI)', blackPlayerP2: 'Black (Player 2)',
         borneOff: 'Borne off', roll: 'Roll Dice', endTurn: 'End Turn', undo: 'Undo Move', newGame: 'New Game',
-        menuTitle: 'Backgammon', menuSubtitle: 'Collector’s Edition',
+        menuTitle: 'Backgammon Classic', menuSubtitle: 'Collector’s Edition',
         variantLabel: 'Choose your game', shortName: 'Backgammon', longName: 'Long Nardy',
         shortCaption: 'Hit blots · re-enter from the bar', longCaption: 'One direction · no hitting',
         shortDescription: 'The classic setup. Hit exposed checkers and re-enter your own from the bar.',
         longDescription: 'All 15 checkers start on the head. Race to your home board, with no hitting or bar.',
-        newVariant: 'New', playAI: 'Play vs AI', playPVP: '2 Players (Local)',
+        newVariant: 'New', diffEasy: 'Easy', diffMedium: 'Medium', diffHard: 'Hard', playAI: 'Play vs AI', playPVP: '2 Players (Local)',
         rules: 'Rules', rulesTitleShort: 'Backgammon Rules', rulesTitleLong: 'Long Nardy Rules',
         close: 'Close', resume: 'Return to Game', chooseMode: 'Choose a game and opponent',
         rollPrompt: 'Roll the dice', movePrompt: 'Your turn — select a checker', targetPrompt: 'Choose a highlighted point',
@@ -1268,6 +1519,11 @@
         ]
       }
     };
+
+    /* Выбранные оформления (объявлены заранее, т.к. используются в applyLanguage) */
+    let currentTheme = 'spider';
+    let currentCheckerSkin = 'classic';
+    let cosmeticsReady = false;
 
     /**
      * Независимая игровая логика. Пункты: 0..23.
@@ -1535,32 +1791,221 @@
         return true;
       }
 
-      /** Один ИИ для обоих вариантов, с учетом разных направлений и правил. */
+      /**
+       * Уровни ИИ:
+       * easy   — прежний «средний» (базовая эвристика с небольшим шумом);
+       * medium — прежний «сложный» (сильная позиционная эвристика без шума);
+       * hard   — экспертный уровень: перебор ходов на все кубики + позиционная оценка.
+       */
       chooseAIMove() {
         if (this.currentPlayer !== 'black') return null;
+        const diff = this.difficulty || 'medium';
+        const moves = this.getLegalMoves('black');
+        if (moves.length === 0) return null;
+        if (diff === 'hard') return this._expertMove(moves);
+
+        const strong = diff === 'medium';
         let bestMove = null;
         let bestScore = -Infinity;
-        for (const move of this.getLegalMoves('black')) {
-          let score = Math.random() * 3;
-          if (move.to === 'off') score += 55;
-          if (move.from === 'bar') score += 35;
+        for (const move of moves) {
+          let score = strong ? 0 : Math.random() * 3;
+          if (move.to === 'off') score += strong ? 85 : 55;
+          if (move.from === 'bar') score += strong ? 50 : 35;
+
           if (typeof move.to === 'number') {
-            score += this.progress(move.to, 'black') * .45;
+            const prog = this.progress(move.to, 'black');
+            score += prog * (strong ? 0.85 : 0.45);
+
             if (this.variant === 'short') {
-              if (this.board[move.to] === 1) score += 40;
-              if (this.board[move.to] === -1) score += 25;
-              if (this.board[move.from] === -2) score -= 12;
+              if (this.board[move.to] === 1) score += strong ? 65 + prog * 0.6 : 40;
+              if (this.board[move.to] === -1) score += strong ? 42 : 25;
+              if (this.board[move.from] === -2) score -= strong ? 28 : 12;
+
+              if (strong) {
+                // Бонус за построение прайма (соседние занятые пункты)
+                const prev = move.to > 0 ? this.board[move.to - 1] : 0;
+                const next = move.to < 23 ? this.board[move.to + 1] : 0;
+                if (prev <= -2) score += 18;
+                if (next <= -2) score += 18;
+                // Штраф за одиночный открытый блот в зоне досягаемости соперника
+                if (this.board[move.to] === 0 && prog < 18) score -= 20;
+                // Бонус за закрытие дома
+                if (prog >= 18 && this.board[move.to] === -1) score += 24;
+              }
             } else {
-              if (move.from === this.head('black')) score += 16;
-              if (this.board[move.to] === 0) score += 9;
-              if (this.board[move.to] < -3) score -= 7;
+              if (move.from === this.head('black')) score += strong ? 26 : 16;
+              if (this.board[move.to] === 0) score += strong ? 14 : 9;
+              if (this.board[move.to] < -3) score -= strong ? 14 : 7;
               if (typeof move.from === 'number' && this.progress(move.from, 'black') < 12) score += 4;
-              score += move.die * .5;
+              score += move.die * (strong ? 0.9 : 0.5);
+
+              if (strong) {
+                const prev = (move.to + 23) % 24;
+                const next = (move.to + 1) % 24;
+                if (this.board[prev] <= -1) score += 12;
+                if (this.board[next] <= -1) score += 12;
+              }
             }
           }
           if (score > bestScore) { bestScore = score; bestMove = move; }
         }
         return bestMove;
+      }
+
+      /** Экспертный выбор: поиск по последовательности ходов на все кубики (с лучом) и позиционная оценка. */
+      _expertMove(moves) {
+        const snapshot = this.cloneState();
+        const candidates = [];
+        for (const move of moves) {
+          this._applyMove(move, 'black');
+          candidates.push({ move, quick: this._expertEval() });
+          this.restoreState(snapshot);
+        }
+        candidates.sort((a, b) => b.quick - a.quick);
+        const remaining = this.remainingDice.length - 1;
+        let best = candidates[0].move;
+        let bestValue = -Infinity;
+        for (const { move } of candidates) {
+          this._applyMove(move, 'black');
+          const value = this._expertSearch(remaining, 4);
+          this.restoreState(snapshot);
+          if (value > bestValue) { bestValue = value; best = move; }
+        }
+        return best;
+      }
+
+      /** Лучшая оценка, если чёрные сыграют ещё n кубиков (ветвление ограничено лучом beam). */
+      _expertSearch(n, beam) {
+        if (this.winner) return this.winner === 'black' ? 1e6 : -1e6;
+        if (n <= 0) return this._expertEval();
+        const raw = this._getRawMoves('black');
+        if (raw.length === 0) return this._expertEval();
+        const snapshot = this.cloneState();
+        const children = [];
+        for (const move of raw) {
+          this._applyMove(move, 'black');
+          children.push({ move, quick: this._expertEval() });
+          this.restoreState(snapshot);
+        }
+        if (n === 1) return Math.max(...children.map(c => c.quick));
+        children.sort((a, b) => b.quick - a.quick);
+        let best = -Infinity;
+        for (const { move } of children.slice(0, beam)) {
+          this._applyMove(move, 'black');
+          const value = this._expertSearch(n - 1, beam);
+          this.restoreState(snapshot);
+          if (value > best) best = value;
+        }
+        return best;
+      }
+
+      /** Вероятность того, что шашка на index будет выбита игроком attacker (короткие нарды). */
+      _hitChance(index, attacker) {
+        const sign = attacker === 'white' ? 1 : -1;
+        const pt = this.progress(index, attacker);
+        const seen = new Array(13).fill(false);
+        for (let j = 0; j < 24; j++) {
+          if (this.board[j] * sign <= 0) continue;
+          const d = pt - this.progress(j, attacker);
+          if (d >= 1 && d <= 12) seen[d] = true;
+        }
+        if (this.bar[attacker] > 0 && pt + 1 <= 6) seen[pt + 1] = true;
+        let miss = 1;
+        for (let d = 1; d <= 12; d++) if (seen[d]) miss *= 1 - (d <= 6 ? 0.31 : 0.1);
+        return 1 - miss;
+      }
+
+      /** Подвижность игрока: число открытых назначений на шаги 1..6. */
+      _mobility(player) {
+        const sign = player === 'white' ? 1 : -1;
+        let count = 0;
+        for (let i = 0; i < 24; i++) {
+          if (this.board[i] * sign <= 0) continue;
+          const p = this.progress(i, player);
+          for (let d = 1; d <= 6; d++) {
+            if (p + d >= 24) break;
+            if (this.isPointOpen(this.indexAtProgress(p + d, player), player)) count++;
+          }
+        }
+        return count;
+      }
+
+      /** Позиционная оценка с точки зрения чёрных (больше — лучше). */
+      _expertEval() {
+        if (this.winner) return this.winner === 'black' ? 1e6 : -1e6;
+        const isShort = this.variant === 'short';
+        const need = isShort ? 2 : 1;
+        const PRIME = [0, 0, 4, 10, 20, 34, 60];
+        const occ = { black: new Array(24).fill(0), white: new Array(24).fill(0) };
+        let pipB = 0;
+        let pipW = 0;
+        for (let i = 0; i < 24; i++) {
+          const v = this.board[i];
+          if (v === 0) continue;
+          if (v < 0) {
+            const p = this.progress(i, 'black');
+            occ.black[p] = -v;
+            pipB += -v * (24 - p);
+          } else {
+            const p = this.progress(i, 'white');
+            occ.white[p] = v;
+            pipW += v * (24 - p);
+          }
+        }
+        pipB += this.bar.black * 25;
+        pipW += this.bar.white * 25;
+        let score = pipW - pipB; // гонка: чем больше пипсов у соперника, тем лучше для нас
+
+        for (const side of ['black', 'white']) {
+          const mult = side === 'black' ? 1 : -1;
+          const opp = side === 'black' ? 'white' : 'black';
+          const o = occ[side];
+          let made = 0;
+          let home = 0;
+          let stack = 0;
+          for (let p = 0; p < 24; p++) {
+            if (o[p] >= need) { made++; if (p >= 18) home++; }
+            if (o[p] > 4) stack += o[p] - 4;
+          }
+          score += mult * (made * 4 + home * 4 - stack * 1.5);
+
+          // Прайм и заблокированные соперником участки
+          let run = 0;
+          let start = 0;
+          const finishRun = () => {
+            if (run === 0) return;
+            let minOpp = Infinity;
+            for (let p = start; p < start + run; p++) {
+              minOpp = Math.min(minOpp, this.progress(this.indexAtProgress(p, side), opp));
+            }
+            let behind = this.bar[opp] > 0 && minOpp > 0 ? this.bar[opp] : 0;
+            for (let q = 0; q < minOpp; q++) behind += occ[opp][q];
+            const bonus = PRIME[Math.min(run, 6)];
+            score += mult * (behind > 0 ? bonus : bonus * 0.15);
+          };
+          for (let p = 0; p <= 24; p++) {
+            if (p < 24 && o[p] >= need) {
+              if (run === 0) start = p;
+              run++;
+            } else {
+              finishRun();
+              run = 0;
+            }
+          }
+        }
+
+        if (isShort) {
+          for (let i = 0; i < 24; i++) {
+            const v = this.board[i];
+            if (v === -1) score -= this._hitChance(i, 'white') * (this.progress(i, 'black') + 7);
+            else if (v === 1) score += this._hitChance(i, 'black') * (this.progress(i, 'white') + 7);
+          }
+          score -= this.bar.black * 10;
+          score += this.bar.white * 10;
+        } else {
+          score += 1.5 * (this._mobility('black') - this._mobility('white'));
+        }
+        return score;
       }
     }
 
@@ -1638,16 +2083,22 @@
         if (typeof text === 'string') el.textContent = text;
       });
       els.nameBlack.textContent = game.mode === 'ai' ? dict.blackPlayerAI : dict.blackPlayerP2;
-      els.btnLang.textContent = lang === 'ru' ? 'EN' : 'RU';
-      els.btnLang.setAttribute('aria-label', dict.languageLabel);
+      if (els.btnLang) {
+        els.btnLang.textContent = lang === 'ru' ? 'EN' : 'RU';
+        els.btnLang.setAttribute('aria-label', dict.languageLabel);
+      }
       const btnLangMenu = byId('btn-lang-menu');
       if (btnLangMenu) {
-        btnLangMenu.textContent = els.btnLang.textContent;
+        btnLangMenu.textContent = lang === 'ru' ? 'EN' : 'RU';
         btnLangMenu.setAttribute('aria-label', dict.languageLabel);
       }
       els.gameVariant.textContent = variantName(game.variant);
       document.title = `${dict.title} · ${variantName(game.variant)} — Collector’s Edition`;
       updateMenuSelection();
+      if (cosmeticsReady) {
+        renderThemeGrid();
+        renderCheckerGrid();
+      }
       if (game.winner) updateWinText();
       updateStatus();
     }
@@ -1693,11 +2144,20 @@
         const firstPoint = topRow && topRow.querySelector('.point');
         if (!firstPoint) return;
         const halfRect = half.getBoundingClientRect();
-        if (!halfRect.width) return;
+        if (!halfRect.width || !halfRect.height) return;
         const style = getComputedStyle(half);
         const ratio = parseFloat(style.getPropertyValue('--checker-width-ratio')) || 0.78;
-        const diameter = Math.floor(Math.min(46, firstPoint.getBoundingClientRect().width * ratio) * 64) / 64;
+        const maxDiameter = parseFloat(style.getPropertyValue('--checker-max-diameter')) || 46;
+        const diameter = Math.floor(Math.min(maxDiameter, firstPoint.getBoundingClientRect().width * ratio) * 64) / 64;
         half.style.setProperty('--checker-diameter', `${diameter}px`);
+
+        // Полотно растягивается по высоте, но медальон со звездой должен оставаться круглым.
+        const medallion = half.querySelector('.marquetry-medallion');
+        if (medallion) {
+          const height = 380 * (halfRect.width / 600) / (halfRect.height / 680);
+          medallion.setAttribute('height', height.toFixed(4));
+          medallion.setAttribute('y', (340 - height / 2).toFixed(4));
+        }
         const radius = Math.max(1, diameter / 2 - 0.35);
         const number = value => Number(value.toFixed(4));
 
@@ -1762,6 +2222,12 @@
       els.trayWhite.classList.remove('valid-target');
       els.trayBlack.classList.remove('valid-target');
       if (selectedSource !== null && human && !isAnimating) {
+        const comboTargets = getComboPaths(selectedSource);
+        comboTargets.forEach((path, to) => {
+          if (path.length < 2) return;
+          const t = to === 'off' ? (game.currentPlayer === 'white' ? els.trayWhite : els.trayBlack) : document.querySelector(`.point[data-index="${to}"]`);
+          if (t) t.classList.add('valid-target');
+        });
         legalMoves.filter(m => m.from === selectedSource).forEach(move => {
           const target = move.to === 'off'
             ? (game.currentPlayer === 'white' ? els.trayWhite : els.trayBlack)
@@ -1781,7 +2247,7 @@
       els.btnRoll.hidden = game.hasRolled && human && !game.winner;
       els.btnRoll.disabled = !hasStarted || game.hasRolled || !human || !!game.winner || isAnimating;
       els.btnEnd.hidden = !game.hasRolled || !human || !!game.winner;
-      els.btnEnd.disabled = legalMoves.length > 0 || isAnimating || !!game.winner;
+      els.btnEnd.disabled = isAnimating || !!game.winner;
       els.btnUndo.disabled = game.history.length === 0 || !human || !!game.winner || isAnimating;
       renderDice();
       updateStatus(legalMoves);
@@ -1848,7 +2314,7 @@
       const start = (sourceChecker || sourceContainer).getBoundingClientRect();
       const destination = to === 'off' ? (color === 'white' ? els.trayWhite : els.trayBlack) : point(to);
       const end = destination.getBoundingClientRect();
-      const size = Math.min(start.width, 44);
+      const size = start.width;
       const startX = start.left + (start.width - size) / 2;
       const startY = start.top + (start.height - size) / 2;
       const endX = end.left + (end.width - size) / 2;
@@ -1884,7 +2350,27 @@
       requestAnimationFrame(step);
     }
 
-    function executeMove(move) {
+    // Суммирование кубиков: все цели, достижимые одной фишкой за несколько шагов.
+    function getComboPaths(source) {
+      const result = new Map();
+      const walk = (from, path) => {
+        for (const m of game.getLegalMoves().filter(x => x.from === from)) {
+          const np = [...path, { from: m.from, to: m.to, die: m.die }];
+          if (!result.has(m.to) || result.get(m.to).length > np.length) result.set(m.to, np);
+          if (m.to !== 'off' && game.makeMove(m)) { walk(m.to, np); game.undo(); }
+        }
+      };
+      walk(source, []);
+      return result;
+    }
+
+    function executePath(path) {
+      if (!path.length) return;
+      const [first, ...rest] = path;
+      executeMove(first, rest.length ? () => executePath(rest) : null);
+    }
+
+    function executeMove(move, onDone = null) {
       if (isAnimating || game.winner) return;
       if (!game.getLegalMoves().some(m => m.from === move.from && m.to === move.to && m.die === move.die)) return;
       const color = game.currentPlayer;
@@ -1895,6 +2381,7 @@
         if (!game.makeMove(move)) { render(); return; }
         render();
         if (game.winner) { showWinModal(); return; }
+        if (onDone) { onDone(); return; }
         if (!isHumanTurn()) {
           if (game.getLegalMoves().length) later(runAIMoveStep, 280);
           else later(finishTurn, 600);
@@ -1913,6 +2400,8 @@
       if (selectedSource !== null) {
         const move = moves.find(m => m.from === selectedSource && m.to === index);
         if (move) { executeMove(move); return; }
+        const path = getComboPaths(selectedSource).get(index);
+        if (path) { executePath(path); return; }
       }
       if (moves.some(m => m.from === index)) {
         selectedSource = selectedSource === index ? null : index;
@@ -1931,7 +2420,9 @@
     function onTrayClick(color) {
       if (!canInteract() || game.currentPlayer !== color || selectedSource === null) return;
       const move = game.getLegalMoves().find(m => m.from === selectedSource && m.to === 'off');
-      if (move) executeMove(move);
+      if (move) { executeMove(move); return; }
+      const path = getComboPaths(selectedSource).get('off');
+      if (path) executePath(path);
     }
 
     function finishTurn() {
@@ -1974,6 +2465,7 @@
     function startNewGame(mode = game.mode, variant = selectedVariant) {
       cancelPendingActions();
       game = new BackgammonGame(mode, variant);
+      game.difficulty = typeof selectedDifficulty !== 'undefined' ? selectedDifficulty : 'medium';
       selectedVariant = game.variant;
       selectedSource = null;
       hasStarted = true;
@@ -1981,6 +2473,8 @@
       els.modalRules.classList.add('hidden');
       els.modalWin.classList.add('hidden');
       applyLanguage();
+      if (typeof applyBoardTheme === 'function') applyBoardTheme(currentTheme);
+      if (typeof applyCheckerSkin === 'function') applyCheckerSkin(currentCheckerSkin);
       render();
       els.btnRoll.focus({ preventScroll: true });
     }
@@ -2011,7 +2505,8 @@
     });
     byId('btn-mode-ai').addEventListener('click', () => startNewGame('ai', selectedVariant));
     byId('btn-mode-pvp').addEventListener('click', () => startNewGame('pvp', selectedVariant));
-    els.btnNew.addEventListener('click', () => startNewGame(game.mode, game.variant));
+    if (els.btnNew) els.btnNew.addEventListener('click', () => startNewGame(game.mode, game.variant));
+    byId('btn-new-top').addEventListener('click', () => startNewGame(game.mode, game.variant));
     byId('btn-win-new').addEventListener('click', () => startNewGame(game.mode, game.variant));
     els.btnMenu.addEventListener('click', openMenu);
     els.btnResume.addEventListener('click', resumeGame);
@@ -2025,7 +2520,7 @@
       byId('btn-rules').focus();
     });
     els.modalMenu.addEventListener('click', event => { if (event.target === els.modalMenu) resumeGame(); });
-    els.btnLang.addEventListener('click', () => {
+    if (els.btnLang) els.btnLang.addEventListener('click', () => {
       lang = lang === 'ru' ? 'en' : 'ru';
       applyLanguage();
       render();
@@ -2096,44 +2591,137 @@
         nameEn: 'Spider Web',
         bg: 'repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.08) 0px, rgba(0, 0, 0, 0.08) 2px, transparent 2px, transparent 9px), radial-gradient(ellipse at center, #4b3321 0%, #342114 65%, #23150c 100%)',
         svg: `<svg viewBox="0 0 200 200" fill="none" stroke="#1d0e05" stroke-width="1.6">
-          <path d="M100 10 L100 190 M10 100 L190 100 M36 36 L164 164 M164 36 L36 164"/>
-          <polygon points="100,25 153,47 175,100 153,153 100,175 47,153 25,100 47,47"/>
-          <polygon points="100,50 135,65 150,100 135,135 100,150 65,135 50,100 65,65"/>
+          <path d="M100 6 L100 194 M6 100 L194 100 M33 33 L167 167 M167 33 L33 167"/>
+          <polygon points="100,14 161,39 186,100 161,161 100,186 39,161 14,100 39,39"/>
+          <polygon points="100,36 145,55 164,100 145,145 100,164 55,145 36,100 55,55"/>
+          <polygon points="100,56 131,69 144,100 131,131 100,144 69,131 56,100 69,69"/>
           <polygon points="100,74 118,82 126,100 118,118 100,126 82,118 74,100 82,82"/>
-          <ellipse cx="100" cy="108" rx="11" ry="15" fill="#1d0e05"/>
-          <circle cx="100" cy="88" r="7" fill="#1d0e05"/>
-          <path d="M93 88 Q75 72 68 85 M93 93 Q72 92 66 105 M93 98 Q74 112 72 126 M94 104 Q80 124 82 138" stroke-width="2.2"/>
-          <path d="M107 88 Q125 72 132 85 M107 93 Q128 92 134 105 M107 98 Q126 112 128 126 M106 104 Q120 124 118 138" stroke-width="2.2"/>
+          <ellipse cx="100" cy="110" rx="13.5" ry="18.5" fill="#1d0e05"/>
+          <circle cx="100" cy="84" r="8.5" fill="#1d0e05"/>
+          <path d="M100 102 V118 M94 108 H106" stroke="#4b3321" stroke-width="2" stroke-linecap="round"/>
+          <path d="M97 77 L95 71 M103 77 L105 71" stroke="#1d0e05" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M91 84 Q68 64 60 79 M91 90 Q64 88 56 104 M92 98 Q66 116 64 132 M93 106 Q74 130 76 146" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M109 84 Q132 64 140 79 M109 90 Q136 88 144 104 M108 98 Q134 116 136 132 M107 106 Q126 130 124 146" stroke-width="2.4" stroke-linecap="round"/>
         </svg>`
       },
       celtic: {
         nameRu: 'Кельтский узор',
         nameEn: 'Celtic Knot',
-        bg: 'repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.1) 0px, rgba(0, 0, 0, 0.1) 2px, transparent 2px, transparent 8px), radial-gradient(ellipse at center, #59412e 0%, #3c291b 65%, #26180f 100%)',
-        svg: `<svg viewBox="0 0 200 200" fill="none" stroke="#1a0c04" stroke-width="3">
-          <circle cx="100" cy="100" r="66"/>
-          <circle cx="100" cy="100" r="46"/>
-          <rect x="44" y="44" width="112" height="112" rx="14" transform="rotate(45 100 100)"/>
-          <rect x="44" y="44" width="112" height="112" rx="14"/>
-          <path d="M100 18 V182 M18 100 H182" stroke-width="2.5"/>
-          <circle cx="100" cy="100" r="14" fill="#1a0c04" fill-opacity="0.35"/>
+        bg: 'repeating-linear-gradient(90deg, rgba(130, 95, 55, 0.08) 0px, rgba(130, 95, 55, 0.08) 2px, transparent 2px, transparent 10px), radial-gradient(ellipse at center, #f3e4ca 0%, #e4cda4 65%, #cfb180 100%)',
+        svg: `<svg viewBox="0 0 200 200" fill="none" stroke="#160c06">
+          <!-- Солнце с волнистыми лучами -->
+          <g fill="#160c06" stroke="none">
+            <path d="M100 18 Q106 38 100 54 Q94 38 100 18 Z"/>
+            <path d="M100 18 Q106 38 100 54 Q94 38 100 18 Z" transform="rotate(30 100 100)"/>
+            <path d="M100 18 Q106 38 100 54 Q94 38 100 18 Z" transform="rotate(60 100 100)"/>
+            <path d="M100 18 Q106 38 100 54 Q94 38 100 18 Z" transform="rotate(90 100 100)"/>
+            <path d="M100 18 Q106 38 100 54 Q94 38 100 18 Z" transform="rotate(120 100 100)"/>
+            <path d="M100 18 Q106 38 100 54 Q94 38 100 18 Z" transform="rotate(150 100 100)"/>
+            <path d="M100 18 Q106 38 100 54 Q94 38 100 18 Z" transform="rotate(180 100 100)"/>
+            <path d="M100 18 Q106 38 100 54 Q94 38 100 18 Z" transform="rotate(210 100 100)"/>
+            <path d="M100 18 Q106 38 100 54 Q94 38 100 18 Z" transform="rotate(240 100 100)"/>
+            <path d="M100 18 Q106 38 100 54 Q94 38 100 18 Z" transform="rotate(270 100 100)"/>
+            <path d="M100 18 Q106 38 100 54 Q94 38 100 18 Z" transform="rotate(300 100 100)"/>
+            <path d="M100 18 Q106 38 100 54 Q94 38 100 18 Z" transform="rotate(330 100 100)"/>
+          </g>
+          <circle cx="100" cy="100" r="34" fill="#e8d4b0" stroke="#160c06" stroke-width="4"/>
+          <path d="M100 72 C112 82 112 96 100 100 C88 104 88 118 100 128" stroke-width="3.5" stroke-linecap="round"/>
+          <path d="M72 100 C82 88 96 88 100 100 C104 112 118 112 128 100" stroke-width="3.5" stroke-linecap="round"/>
         </svg>`
       },
       marquetry: {
-        nameRu: 'Маркетри',
-        nameEn: 'Marquetry Inlay',
+        nameRu: 'Ганста',
+        nameEn: 'Gangsta',
         bg: 'repeating-linear-gradient(90deg, rgba(120, 92, 55, 0.10) 0px, rgba(120, 92, 55, 0.10) 2px, transparent 2px, transparent 9px), radial-gradient(ellipse at center, #f2e6cd 0%, #e4d2ae 62%, #cdb488 100%)',
         fullBoard: true,
         previewSvg: `<svg viewBox="0 0 200 200" fill="none" stroke="#2a1708" stroke-width="2.4">
-          <path d="M100 12 L100 188 M12 100 L188 100 M38 38 L162 162 M162 38 L38 162"/>
-          <polygon points="100,26 154,50 174,100 154,150 100,174 46,150 26,100 46,50"/>
-          <polygon points="100,54 132,68 146,100 132,132 100,146 68,132 54,100 68,68"/>
-          <ellipse cx="100" cy="112" rx="10" ry="14" fill="#2a1708"/>
-          <circle cx="100" cy="92" r="7" fill="#2a1708"/>
-          <path d="M93 92 Q74 76 67 89 M93 97 Q72 96 66 108 M93 102 Q74 116 72 130" stroke-width="2.6"/>
-          <path d="M107 92 Q126 76 133 89 M107 97 Q128 96 134 108 M107 102 Q126 116 128 130" stroke-width="2.6"/>
+          <polygon points="100,16 122,74 184,100 122,126 100,184 78,126 16,100 78,74" fill="rgba(42,23,8,0.22)"/>
+          <circle cx="100" cy="100" r="42"/>
+          <g transform="translate(86,102) scale(1.1) rotate(-34)" stroke="#2a1708">
+            <path d="M-24 -7 L30 -7 L32 -4 L32 3 L-24 3 Z" fill="#e5d4b3" stroke-width="2.2"/>
+            <path d="M-24 -7 L30 -7 L32 -4 L-24 -4 Z" fill="#2a1708"/>
+            <path d="M-22 6 L-9 6 L-12 29 Q-13 33 -18 33 L-26 31 Z" fill="#2a1708"/>
+          </g>
+          <g transform="translate(114,102) scale(-1.1,1.1) rotate(-34)" stroke="#2a1708">
+            <path d="M-24 -7 L30 -7 L32 -4 L32 3 L-24 3 Z" fill="#e5d4b3" stroke-width="2.2"/>
+            <path d="M-24 -7 L30 -7 L32 -4 L-24 -4 Z" fill="#2a1708"/>
+            <path d="M-22 6 L-9 6 L-12 29 Q-13 33 -18 33 L-26 31 Z" fill="#2a1708"/>
+          </g>
         </svg>`,
         svg: `<svg viewBox="0 0 600 680" preserveAspectRatio="none" fill="none" style="width:100%;height:100%;filter:drop-shadow(0 1px 0 rgba(255,246,226,0.35)) drop-shadow(0 0 3px rgba(60,32,12,0.35));">${buildMarquetryInner()}</svg>`
+      },
+      imperial: {
+        nameRu: 'Имперский герб',
+        nameEn: 'Imperial Eagle',
+        bg: 'repeating-linear-gradient(90deg, rgba(120, 80, 40, 0.07) 0px, rgba(120, 80, 40, 0.07) 2px, transparent 2px, transparent 9px), radial-gradient(ellipse at center, #e9d6b0 0%, #d4b57f 60%, #a67c45 100%)',
+        svg: `<svg viewBox="0 0 200 200" fill="none" stroke="#3a1f08" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+          <g fill="#4a2a0c" fill-opacity="0.85">
+            <!-- Крылья -->
+            <path d="M92 92 C70 70 48 66 24 72 C40 76 48 84 50 92 C38 92 30 98 26 106 C40 104 50 106 56 112 C46 116 42 124 42 132 C54 126 66 124 76 126 C70 132 68 140 70 148 C78 138 88 130 96 126 Z"/>
+            <path d="M108 92 C130 70 152 66 176 72 C160 76 152 84 150 92 C162 92 170 98 174 106 C160 104 150 106 144 112 C154 116 158 124 158 132 C146 126 134 124 124 126 C130 132 132 140 130 148 C122 138 112 130 104 126 Z"/>
+            <!-- Хвост -->
+            <path d="M88 130 L100 170 L112 130 Z"/>
+            <path d="M80 150 L100 178 L120 150 L112 152 L100 166 L88 152 Z"/>
+            <!-- Туловище -->
+            <ellipse cx="100" cy="112" rx="14" ry="22"/>
+            <!-- Шеи и головы -->
+            <path d="M92 92 C84 84 78 76 80 66 C84 60 92 60 96 68 L94 80 Z"/>
+            <path d="M108 92 C116 84 122 76 120 66 C116 60 108 60 104 68 L106 80 Z"/>
+            <circle cx="82" cy="64" r="7"/>
+            <circle cx="118" cy="64" r="7"/>
+            <path d="M75 64 L66 68 L76 69 Z"/>
+            <path d="M125 64 L134 68 L124 69 Z"/>
+          </g>
+          <!-- Короны -->
+          <g fill="#6b4514" stroke="#3a1f08" stroke-width="1.5">
+            <path d="M74 54 L76 46 L80 51 L82 44 L84 51 L88 46 L90 54 Z"/>
+            <path d="M110 54 L112 46 L116 51 L118 44 L120 51 L124 46 L126 54 Z"/>
+            <path d="M90 40 L93 28 L98 36 L100 24 L102 36 L107 28 L110 40 Z"/>
+            <circle cx="100" cy="20" r="3"/>
+          </g>
+          <path d="M100 42 V56" stroke-width="2.5"/>
+          <!-- Скипетр и держава -->
+          <path d="M34 72 L66 100" stroke-width="3"/>
+          <circle cx="32" cy="70" r="5" fill="#6b4514"/>
+          <path d="M166 72 L134 100" stroke-width="3"/>
+          <circle cx="168" cy="70" r="7" fill="#6b4514"/>
+          <path d="M168 60 V66 M165 63 H171" stroke-width="2"/>
+          <!-- Щит с всадником -->
+          <path d="M88 96 H112 V116 C112 124 106 130 100 134 C94 130 88 124 88 116 Z" fill="#e6cfa3" stroke-width="2.5"/>
+          <path d="M94 118 C96 112 102 110 106 108 M98 120 L102 112 M100 108 L104 104" stroke-width="2"/>
+          <circle cx="104" cy="104" r="2.2" fill="#3a1f08"/>
+        </svg>`
+      },
+      nautical: {
+        nameRu: 'Морской',
+        nameEn: 'Nautical',
+        bg: 'repeating-linear-gradient(90deg, rgba(80, 45, 18, 0.1) 0px, rgba(80, 45, 18, 0.1) 2px, transparent 2px, transparent 10px), radial-gradient(ellipse at center, #c89862 0%, #ab7946 65%, #8a5c30 100%)',
+        svg: `<svg viewBox="0 0 200 200" fill="none" stroke="#160c06" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="100" cy="100" r="56" stroke-width="2.6"/>
+          <circle cx="100" cy="100" r="44" stroke-width="2.4"/>
+          <circle cx="100" cy="100" r="18" stroke-width="2.6"/>
+          <circle cx="100" cy="100" r="12" stroke-width="2"/>
+          <g stroke-width="2">
+            <!-- 8 основных спиц с токарными ручками -->
+            ${[0,45,90,135,180,225,270,315].map(a => `
+              <g transform="rotate(${a} 100 100)">
+                <line x1="100" y1="82" x2="100" y2="56" stroke-width="2.6"/>
+                <circle cx="100" cy="70" r="2.5" fill="#c89862" stroke-width="1.8"/>
+                <line x1="100" y1="44" x2="100" y2="33" stroke-width="2.4"/>
+                <rect x="96.5" y="18" width="7" height="15" rx="3.5" fill="#c89862" stroke-width="2.2"/>
+                <circle cx="100" cy="50" r="2.2" fill="none" stroke-width="1.6"/>
+              </g>
+            `).join('')}
+            <!-- 8 промежуточных коротких штырьков и заклёпок -->
+            ${[22.5,67.5,112.5,157.5,202.5,247.5,292.5,337.5].map(a => `
+              <g transform="rotate(${a} 100 100)">
+                <line x1="100" y1="44" x2="100" y2="37" stroke-width="2"/>
+                <circle cx="100" cy="35" r="2.4" fill="#c89862" stroke-width="1.8"/>
+                <circle cx="100" cy="50" r="2.2" fill="none" stroke-width="1.6"/>
+              </g>
+            `).join('')}
+          </g>
+        </svg>`
       },
       maple: {
         nameRu: 'Светлый клён',
@@ -2239,13 +2827,11 @@
         <circle cx="-16" cy="12" r="1.4" fill="#e5d4b3" stroke="none"/>
         <circle cx="-18" cy="27" r="1.4" fill="#e5d4b3" stroke="none"/>
       </g>`;
-      medal += `<g transform="translate(${cx - 8},${cy + 2}) scale(1.4) rotate(-38)">${pistol}</g>`;
-      medal += `<g transform="translate(${cx + 8},${cy + 2}) scale(-1.4,1.4) rotate(-38)">${pistol}</g>`;
-      d += `<svg x="110" y="205" width="380" height="270" viewBox="0 0 270 270" preserveAspectRatio="none">${medal}</svg>`;
+      medal += `<g transform="translate(${cx - 14},${cy + 2}) scale(1.3) rotate(-34)">${pistol}</g>`;
+      medal += `<g transform="translate(${cx + 14},${cy + 2}) scale(-1.3,1.3) rotate(-34)">${pistol}</g>`;
+      d += `<svg class="marquetry-medallion" x="110" y="205" width="380" height="270" viewBox="0 0 270 270" preserveAspectRatio="none">${medal}</svg>`;
       return d;
     }
-
-    let currentTheme = 'spider';
 
     function applyBoardTheme(key) {
       const theme = BOARD_THEMES[key] || BOARD_THEMES.spider;
@@ -2264,6 +2850,7 @@
           art.style.opacity = key === 'maple' ? '0.68' : '0.78';
         }
       });
+      syncCheckerSeats();
       renderThemeGrid();
     }
 
@@ -2284,15 +2871,119 @@
       });
     }
 
+    /* ---------------------------------------------------------------
+       Стили шашек: переключаются в разделе «Стиль шашек» окна «Косметика».
+       Каждый стиль задаёт цвет «белых»/«чёрных» шашек и тоны
+       концентрической токарной резьбы (псевдоэлемент ::after).
+       --------------------------------------------------------------- */
+    const CHECKER_SKINS = {
+      classic: {
+        nameRu: 'Классика', nameEn: 'Classic',
+        white: 'var(--ivory)', black: 'var(--ebony)',
+        ringsDark: 'repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.22) 0px, rgba(0,0,0,0.45) 2px, transparent 3.5px, rgba(255,255,255,0.16) 5px, rgba(0,0,0,0.35) 6.5px)',
+        ringsLight: 'repeating-radial-gradient(circle at 50% 50%, rgba(255,252,240,0.55) 0px, rgba(120,90,45,0.45) 2px, rgba(235,215,175,0.2) 3.5px, rgba(255,250,235,0.4) 5px, rgba(110,80,35,0.4) 6.5px)'
+      },
+      pearl: {
+        nameRu: 'Перламутр', nameEn: 'Mother of Pearl',
+        white: 'conic-gradient(from 200deg at 50% 50%, #fff4f8 0deg, #e7f0ff 55deg, #f4eaff 110deg, #fff9e8 165deg, #e9fbf2 225deg, #ffeef6 285deg, #fff4f8 360deg)',
+        black: 'radial-gradient(circle at 34% 26%, #4a5c80 0%, #232d44 46%, #0b0f18 100%)',
+        ringsDark: 'repeating-radial-gradient(circle at 50% 50%, rgba(190,215,255,0.28) 0px, rgba(0,0,0,0.5) 2px, transparent 3.5px, rgba(255,205,235,0.2) 5px, rgba(0,0,0,0.4) 6.5px)',
+        ringsLight: 'repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.6) 0px, rgba(140,160,200,0.4) 2px, rgba(255,240,250,0.25) 3.5px, rgba(255,255,255,0.45) 5px, rgba(120,140,180,0.35) 6.5px)'
+      }
+    };
+
+    const baseSkins = Object.entries(CHECKER_SKINS);
+    baseSkins.forEach(([k, v]) => {
+      CHECKER_SKINS[k + '_star'] = {
+        ...v,
+        nameRu: v.nameRu + ' (Звезда)',
+        nameEn: v.nameEn + ' (Star)',
+        star: true
+      };
+    });
+    baseSkins.forEach(([k, v]) => {
+      CHECKER_SKINS[k + '_compass'] = {
+        ...v,
+        nameRu: v.nameRu + ' (Звезда)',
+        nameEn: v.nameEn + ' (Star)',
+        compass: true
+      };
+    });
+    baseSkins.forEach(([k, v]) => {
+      CHECKER_SKINS[k + '_spider'] = {
+        ...v,
+        nameRu: v.nameRu + ' (Паук)',
+        nameEn: v.nameEn + ' (Spider)',
+        spider: true
+      };
+    });
+
+    const checkerSkinStyle = document.createElement('style');
+    checkerSkinStyle.id = 'checker-skin-css';
+    document.head.appendChild(checkerSkinStyle);
+
+    function applyCheckerSkin(key) {
+      const skin = CHECKER_SKINS[key] || CHECKER_SKINS.classic;
+      currentCheckerSkin = key;
+      document.body.dataset.checkers = key;
+      checkerSkinStyle.textContent = `
+        body[data-checkers="${key}"] .checker.white,
+        body[data-checkers="${key}"] .checker-icon.white,
+        body[data-checkers="${key}"] .flying-checker.white { background: ${skin.white}; }
+        body[data-checkers="${key}"] .checker.black,
+        body[data-checkers="${key}"] .checker-icon.black,
+        body[data-checkers="${key}"] .flying-checker.black { background: ${skin.black}; }
+        body[data-checkers="${key}"] .checker::after {
+          background: ${skin.star ? `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,14 59,39 85,39 64,55 72,81 50,65 28,81 36,55 15,39 41,39' fill='none' stroke='rgba(212,175,55,0.85)' stroke-width='4'/%3E%3C/svg%3E") center/70% 70% no-repeat, ` : skin.compass ? `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,8 57,43 92,50 57,57 50,92 43,57 8,50 43,43' fill='none' stroke='rgba(212,175,55,0.85)' stroke-width='3'/%3E%3Cpolygon points='50,24 54,46 76,50 54,54 50,76 46,54 24,50 46,46' transform='rotate(45 50 50)' fill='none' stroke='rgba(212,175,55,0.65)' stroke-width='2.5'/%3E%3C/svg%3E") center/76% 76% no-repeat, ` : ""}${skin.spider ? `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='rgba(212,175,55,0.85)' stroke-width='3.5' stroke-linecap='round'%3E%3Cellipse cx='50' cy='37' rx='9' ry='12' fill='rgba(212,175,55,0.22)'/%3E%3Cpath d='M50 31 V43 M45 37 H55' stroke-width='2.5'/%3E%3Cellipse cx='50' cy='62' rx='7' ry='10' fill='rgba(212,175,55,0.22)'/%3E%3Cpath d='M41 36 Q24 28 30 16 M41 44 Q20 40 24 26 M43 56 Q22 60 22 76 M44 64 Q30 76 38 86'/%3E%3Cpath d='M59 36 Q76 28 70 16 M59 44 Q80 40 76 26 M57 56 Q78 60 78 76 M56 64 Q70 76 62 86'/%3E%3C/svg%3E") center/76% 76% no-repeat, ` : ""}${skin.ringsDark};
+        }
+        body[data-checkers="${key}"] .checker.white::after {
+          background: ${skin.star ? `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,14 59,39 85,39 64,55 72,81 50,65 28,81 36,55 15,39 41,39' fill='none' stroke='rgba(92,62,24,0.75)' stroke-width='4'/%3E%3C/svg%3E") center/70% 70% no-repeat, ` : skin.compass ? `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,8 57,43 92,50 57,57 50,92 43,57 8,50 43,43' fill='none' stroke='rgba(92,62,24,0.8)' stroke-width='3'/%3E%3Cpolygon points='50,24 54,46 76,50 54,54 50,76 46,54 24,50 46,46' transform='rotate(45 50 50)' fill='none' stroke='rgba(92,62,24,0.6)' stroke-width='2.5'/%3E%3C/svg%3E") center/76% 76% no-repeat, ` : ""}${skin.spider ? `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='rgba(75,45,16,0.82)' stroke-width='3.5' stroke-linecap='round'%3E%3Cellipse cx='50' cy='37' rx='9' ry='12' fill='rgba(75,45,16,0.18)'/%3E%3Cpath d='M50 31 V43 M45 37 H55' stroke-width='2.5'/%3E%3Cellipse cx='50' cy='62' rx='7' ry='10' fill='rgba(75,45,16,0.18)'/%3E%3Cpath d='M41 36 Q24 28 30 16 M41 44 Q20 40 24 26 M43 56 Q22 60 22 76 M44 64 Q30 76 38 86'/%3E%3Cpath d='M59 36 Q76 28 70 16 M59 44 Q80 40 76 26 M57 56 Q78 60 78 76 M56 64 Q70 76 62 86'/%3E%3C/svg%3E") center/76% 76% no-repeat, ` : ""}${skin.ringsLight};
+        }
+      `;
+      renderCheckerGrid();
+    }
+
+    function renderCheckerGrid() {
+      const grid = byId('checker-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      Object.entries(CHECKER_SKINS).forEach(([key, skin]) => {
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'theme-card' + (currentCheckerSkin === key ? ' active' : '');
+        card.innerHTML = `
+          <div class="skin-preview">
+            <span class="checker-icon white" style="background: ${skin.white};"></span>
+            <span class="checker-icon black" style="background: ${skin.black};"></span>
+          </div>
+          <span>${lang === 'ru' ? skin.nameRu : skin.nameEn}</span>
+        `;
+        card.addEventListener('click', () => applyCheckerSkin(key));
+        grid.appendChild(card);
+      });
+    }
+
     const modalCosmetics = byId('modal-cosmetics');
     byId('btn-cosmetics').addEventListener('click', () => {
       renderThemeGrid();
+      renderCheckerGrid();
       modalCosmetics.classList.remove('hidden');
     });
     byId('btn-close-cosmetics').addEventListener('click', () => modalCosmetics.classList.add('hidden'));
     modalCosmetics.addEventListener('click', e => { if (e.target === modalCosmetics) modalCosmetics.classList.add('hidden'); });
 
+    let selectedDifficulty = 'medium';
+    document.querySelectorAll('.diff-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedDifficulty = btn.dataset.diff || 'medium';
+        document.querySelectorAll('.diff-btn').forEach(b => b.classList.toggle('active', b === btn));
+        if (game) game.difficulty = selectedDifficulty;
+      });
+    });
+
     applyBoardTheme(currentTheme);
+    applyCheckerSkin(currentCheckerSkin);
+    cosmeticsReady = true;
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5e09909ae47623e',t:'MTc5NTI3MzU4MQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5e09909ae47623e',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
