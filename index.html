@@ -3279,71 +3279,13 @@
     byId('btn-find-match').addEventListener('click', () => {
       connectWS(() => ws.send(JSON.stringify({ type: 'find_match', variant: selectedVariant, name: getPlayerName(), rating: myRating })));
     });
-    function initPeer(id) {
-      if (peer) { try { peer.destroy(); } catch (e) {} }
-      if (typeof Peer === 'undefined') {
-        onlineStatus.textContent = lang === 'ru' ? 'PeerJS не загружен' : 'PeerJS not loaded';
-        return null;
-      }
-      return id ? new Peer(id) : new Peer();
-    }
     byId('btn-create-room').addEventListener('click', () => {
-      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-      let code = '';
-      for (let i = 0; i < 5; i++) code += chars[Math.floor(Math.random() * chars.length)];
-      onlineStatus.textContent = lang === 'ru' ? 'Создание комнаты...' : 'Creating room...';
-      peer = initPeer('nardy-' + code);
-      if (!peer) { connectWS(() => ws.send(JSON.stringify({ type: 'create_room', variant: selectedVariant, name: getPlayerName(), rating: myRating }))); return; }
-      peer.on('open', () => {
-        onlineStatus.textContent = (lang === 'ru' ? 'Код комнаты: ' : 'Room code: ') + code;
-      });
-      peer.on('connection', (conn) => {
-        peerConn = conn;
-        myOnlineColor = 'white';
-        conn.on('open', () => {
-          conn.send({ type: 'peer_hello', name: getPlayerName(), rating: myRating, variant: selectedVariant });
-          modalOnline.classList.add('hidden');
-          startNewGame('online', selectedVariant);
-          els.status.textContent = lang === 'ru' ? 'Вы играете Белыми' : 'You play White';
-        });
-        conn.on('data', handleOnlineMsg);
-        conn.on('close', () => {
-          els.status.textContent = lang === 'ru' ? 'Соперник покинул игру' : 'Opponent left the game';
-        });
-      });
-      peer.on('error', (err) => {
-        if (err && (err.type === 'network' || err.type === 'server-error')) { connectWS(() => ws.send(JSON.stringify({ type: 'create_room', variant: selectedVariant, name: getPlayerName(), rating: myRating }))); } else { onlineStatus.textContent = (lang === 'ru' ? 'Ошибка: ' : 'Error: ') + (err.type || err.message); }
-      });
+      connectWS(() => ws.send(JSON.stringify({ type: 'create_room', variant: selectedVariant, name: getPlayerName(), rating: myRating })));
     });
     byId('btn-join-room').addEventListener('click', () => {
       const code = roomInput.value.trim().toUpperCase();
       if (!code) return;
-      onlineStatus.textContent = lang === 'ru' ? 'Подключение к комнате...' : 'Joining room...';
-      peer = initPeer();
-      if (!peer) { connectWS(() => ws.send(JSON.stringify({ type: 'join_room', code, name: getPlayerName(), rating: myRating }))); return; }
-      peer.on('open', () => {
-        const conn = peer.connect('nardy-' + code);
-        peerConn = conn;
-        myOnlineColor = 'black';
-        conn.on('open', () => {
-          conn.send({ type: 'peer_hello', name: getPlayerName(), rating: myRating });
-          modalOnline.classList.add('hidden');
-          startNewGame('online', selectedVariant);
-          els.status.textContent = lang === 'ru' ? 'Вы играете Черными' : 'You play Black';
-        });
-        conn.on('data', (msg) => {
-          if (msg && msg.type === 'peer_hello' && msg.variant && msg.variant !== game.variant) {
-            startNewGame('online', msg.variant);
-          }
-          handleOnlineMsg(msg);
-        });
-        conn.on('close', () => {
-          els.status.textContent = lang === 'ru' ? 'Соперник покинул игру' : 'Opponent left the game';
-        });
-      });
-      peer.on('error', (err) => {
-        onlineStatus.textContent = (lang === 'ru' ? 'Комната не найдена: ' : 'Room not found: ') + (err.type || '');
-      });
+      connectWS(() => ws.send(JSON.stringify({ type: 'join_room', code, name: getPlayerName(), rating: myRating })));
     });
   </script>
 
