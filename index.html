@@ -2119,7 +2119,7 @@
         const text = dict[el.dataset.i18n];
         if (typeof text === 'string') el.textContent = text;
       });
-      els.nameBlack.textContent = game.mode === 'ai' ? dict.blackPlayerAI : dict.blackPlayerP2;
+      if (game.mode !== 'online') els.nameBlack.textContent = game.mode === 'ai' ? dict.blackPlayerAI : dict.blackPlayerP2;
       if (els.btnLang) {
         els.btnLang.textContent = lang === 'ru' ? 'EN' : 'RU';
         els.btnLang.setAttribute('aria-label', dict.languageLabel);
@@ -2280,7 +2280,7 @@
       els.offBlack.textContent = game.borneOff.black;
       els.cardWhite.classList.toggle('active', hasStarted && game.currentPlayer === 'white');
       els.cardBlack.classList.toggle('active', hasStarted && game.currentPlayer === 'black');
-      els.nameBlack.textContent = game.mode === 'ai' ? dict.blackPlayerAI : dict.blackPlayerP2;
+      if (game.mode !== 'online') els.nameBlack.textContent = game.mode === 'ai' ? dict.blackPlayerAI : dict.blackPlayerP2;
       els.btnRoll.hidden = game.hasRolled && human && !game.winner;
       els.btnRoll.disabled = !hasStarted || game.hasRolled || !human || !!game.winner || isAnimating;
       els.btnEnd.hidden = !game.hasRolled || !human || !!game.winner;
@@ -3242,5 +3242,5 @@
   </script>
 
   <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js" async onload="if(window.vkBridge)vkBridge.send('VKWebAppInit').catch(function(){});"></script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a6010786e9b4fff2',t:'MTc5NTYxMzY1MQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a6010786e9b4fff2',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
