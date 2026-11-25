@@ -1447,11 +1447,15 @@
       <p id="online-status" style="min-height: 22px; color: var(--gold-light);"></p>
       <div style="display:flex; flex-direction:column; gap:10px; margin:14px 0;">
         <input id="online-server-url" type="hidden" value="wss://nardy-server-3mqb.onrender.com" />
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input id="online-player-name" type="text" maxlength="18" placeholder="Ваше имя / Your name" style="flex:1 1 0; min-width:0; padding:9px 12px; border-radius:6px; border:1px solid var(--gold-dark); background:#120d08; color:var(--text-main); font-family:inherit;" />
+          <div id="online-my-rating" style="padding:8px 10px; border-radius:6px; border:1px solid var(--gold-dark); background:#1b130c; color:var(--gold-light); font-weight:700; white-space:nowrap;">★ 1000</div>
+        </div>
         <button class="btn btn-primary" id="btn-find-match" data-i18n="findMatch">Найти соперника</button>
         <button class="btn" id="btn-create-room" data-i18n="createRoom">Создать комнату</button>
         <div style="display:flex; gap:8px;">
-          <input id="online-room-code" type="text" maxlength="6" placeholder="Код / Code" style="flex:1; padding:9px 12px; border-radius:6px; border:1px solid var(--gold-dark); background:#120d08; color:var(--text-main); text-transform:uppercase; font-family:inherit;" />
-          <button class="btn" id="btn-join-room" data-i18n="joinRoom">Войти</button>
+          <input id="online-room-code" type="text" maxlength="6" placeholder="Код / Code" style="flex:1 1 0; min-width:0; width:100%; padding:9px 12px; border-radius:6px; border:1px solid var(--gold-dark); background:#120d08; color:var(--text-main); text-transform:uppercase; font-family:inherit;" />
+          <button class="btn" id="btn-join-room" data-i18n="joinRoom" style="flex-shrink:0;">Войти</button>
         </div>
       </div>
       <button class="btn" id="btn-close-online" data-i18n="close">Закрыть</button>
@@ -2065,7 +2069,8 @@
       rulesList: byId('rules-list'), rulesTitle: byId('rules-title'), variantDescription: byId('variant-description')
     };
 
-    const isHumanTurn = () => game.mode !== 'ai' || game.currentPlayer === 'white';
+    let myOnlineColor = 'white';
+    const isHumanTurn = () => game.mode === 'online' ? game.currentPlayer === myOnlineColor : (game.mode !== 'ai' || game.currentPlayer === 'white');
     const overlayOpen = () => !els.modalMenu.classList.contains('hidden') || !els.modalRules.classList.contains('hidden');
     const variantName = (variant) => I18N[lang][variant === 'long' ? 'longName' : 'shortName'];
 
@@ -2416,7 +2421,7 @@
         render();
         if (game.winner) { showWinModal(); return; }
         if (onDone) { onDone(); return; }
-        if (!isHumanTurn()) {
+        if (game.mode === 'ai' && !isHumanTurn()) {
           if (game.getLegalMoves().length) later(runAIMoveStep, 280);
           else later(finishTurn, 600);
         }
@@ -2480,6 +2485,7 @@
     }
 
     function runAIMoveStep() {
+      if (game.mode !== 'ai') return;
       if (game.winner || isHumanTurn() || !game.hasRolled || isAnimating) return;
       const move = game.chooseAIMove();
       if (move) executeMove(move);
@@ -2494,6 +2500,12 @@
 
     function showWinModal() {
       playSound('win');
+      if (game.mode === 'online') {
+        if (game.winner === myOnlineColor) myRating += 25;
+        else myRating = Math.max(100, myRating - 15);
+        try { localStorage.setItem('nardy_player_rating', String(myRating)); } catch (e) {}
+        ratingBadge.textContent = `★ ${myRating}`;
+      }
       updateWinText();
       els.modalWin.classList.remove('hidden');
       byId('btn-win-new').focus();
@@ -3108,12 +3120,23 @@
     const onlineStatus = byId('online-status');
     const serverInput = byId('online-server-url');
     const roomInput = byId('online-room-code');
-
+    const nameInput = byId('online-player-name');
+    const ratingBadge = byId('online-my-rating');
+    let myRating = 1000;
+    let onlineOpponentName = 'Соперник';
+    let onlineOpponentRating = 1000;
     try {
-      serverInput.value = localStorage.getItem('nardy_ws_url') || 'wss://nardy-server-3mqb.onrender.com';
-    } catch (e) {
-      serverInput.value = 'wss://nardy-server-3mqb.onrender.com';
+      nameInput.value = localStorage.getItem('nardy_player_name') || '';
+      myRating = parseInt(localStorage.getItem('nardy_player_rating') || '1000', 10) || 1000;
+    } catch (e) {}
+    ratingBadge.textContent = `★ ${myRating}`;
+    function getPlayerName() {
+      const n = (nameInput.value || '').trim() || (lang === 'ru' ? 'Игрок' : 'Player');
+      try { localStorage.setItem('nardy_player_name', n); } catch (e) {}
+      return n;
     }
+
+    serverInput.value = 'wss://nardy-server-3mqb.onrender.com';
 
     function sendOnline(payload) {
       if (game.mode === 'online' && ws && ws.readyState === WebSocket.OPEN) {
@@ -3121,18 +3144,30 @@
       }
     }
 
-    function connectWS(onOpenAction) {
-      const url = serverInput.value.trim();
+    function connectWS(onOpenAction, attempt = 1) {
+      const url = (serverInput.value || 'wss://nardy-server-3mqb.onrender.com').trim();
       if (!url) return;
-      try { localStorage.setItem('nardy_ws_url', url); } catch (e) {}
-      if (ws) { try { ws.close(); } catch (e) {} }
-      onlineStatus.textContent = lang === 'ru' ? 'Подключение к серверу...' : 'Connecting to server...';
+      if (ws) { ws.onopen = ws.onmessage = ws.onerror = ws.onclose = null; try { ws.close(); } catch (e) {} }
+      if (attempt === 1) {
+        onlineStatus.textContent = lang === 'ru' ? 'Подключение к серверу...' : 'Connecting to server...';
+        try { fetch(url.replace(/^wss:/, 'https:').replace(/^ws:/, 'http:'), { mode: 'no-cors' }).catch(() => {}); } catch (e) {}
+      } else {
+        onlineStatus.textContent = lang === 'ru'
+          ? `Пробуждение сервера (попытка ${attempt}/4)...`
+          : `Waking up server (attempt ${attempt}/4)...`;
+      }
+      let opened = false;
       ws = new WebSocket(url);
       ws.onopen = () => {
+        opened = true;
         if (onOpenAction) onOpenAction();
       };
       ws.onerror = () => {
-        onlineStatus.textContent = lang === 'ru' ? 'Ошибка подключения к серверу' : 'Connection error';
+        if (!opened && attempt < 4) {
+          setTimeout(() => connectWS(onOpenAction, attempt + 1), 4000);
+        } else if (!opened) {
+          onlineStatus.textContent = (lang === 'ru' ? 'Ошибка подключения к серверу' : 'Connection error') + ' (проверьте интернет / VPN)';
+        }
       };
       ws.onmessage = (ev) => {
         let msg;
@@ -3145,8 +3180,14 @@
           onlineStatus.textContent = msg.message || 'Error';
         } else if (msg.type === 'matched') {
           myOnlineColor = msg.color;
+          onlineOpponentName = msg.opponentName || (lang === 'ru' ? 'Соперник' : 'Opponent');
+          onlineOpponentRating = msg.opponentRating || 1000;
           modalOnline.classList.add('hidden');
           startNewGame('online', msg.variant || selectedVariant);
+          const myLabel = `${getPlayerName()} (★${myRating})`;
+          const oppLabel = `${onlineOpponentName} (★${onlineOpponentRating})`;
+          els.nameWhite.textContent = myOnlineColor === 'white' ? myLabel : oppLabel;
+          els.nameBlack.textContent = myOnlineColor === 'black' ? myLabel : oppLabel;
           els.status.textContent = lang === 'ru'
             ? (myOnlineColor === 'white' ? 'Вы играете Белыми' : 'Вы играете Черными')
             : (myOnlineColor === 'white' ? 'You play White' : 'You play Black');
@@ -3188,15 +3229,15 @@
       if (ws && game.mode !== 'online') { try { ws.close(); } catch (e) {} }
     });
     byId('btn-find-match').addEventListener('click', () => {
-      connectWS(() => ws.send(JSON.stringify({ type: 'find_match', variant: selectedVariant })));
+      connectWS(() => ws.send(JSON.stringify({ type: 'find_match', variant: selectedVariant, name: getPlayerName(), rating: myRating })));
     });
     byId('btn-create-room').addEventListener('click', () => {
-      connectWS(() => ws.send(JSON.stringify({ type: 'create_room', variant: selectedVariant })));
+      connectWS(() => ws.send(JSON.stringify({ type: 'create_room', variant: selectedVariant, name: getPlayerName(), rating: myRating })));
     });
     byId('btn-join-room').addEventListener('click', () => {
       const code = roomInput.value.trim().toUpperCase();
       if (!code) return;
-      connectWS(() => ws.send(JSON.stringify({ type: 'join_room', code })));
+      connectWS(() => ws.send(JSON.stringify({ type: 'join_room', code, name: getPlayerName(), rating: myRating })));
     });
   </script>
 
