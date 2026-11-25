@@ -1185,6 +1185,20 @@
         margin: 0 auto;
       }
     }
+
+    /* Система рангов, лиг и достижений */
+    .ranks-tabs { display: flex; gap: 6px; margin-bottom: 12px; justify-content: center; flex-wrap: wrap; }
+    .ranks-tab { padding: 7px 12px; border-radius: 6px; border: 1px solid var(--gold-dark); background: #1a120b; color: var(--text-muted); cursor: pointer; font-family: inherit; font-size: 0.85rem; }
+    .ranks-tab.active { background: linear-gradient(180deg, var(--gold-mid), var(--gold-dark)); color: #fff; font-weight: 700; border-color: var(--gold-light); }
+    .ranks-list { display: flex; flex-direction: column; gap: 8px; max-height: 48vh; overflow-y: auto; padding-right: 4px; text-align: left; }
+    .rank-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 12px; border-radius: 8px; border: 1px solid rgba(212,175,55,0.28); background: rgba(20,14,9,0.85); }
+    .rank-item.current { border-color: var(--gold-light); background: linear-gradient(90deg, rgba(212,175,55,0.18), rgba(20,14,9,0.9)); box-shadow: 0 0 10px rgba(212,175,55,0.2); }
+    .rank-item.done { border-color: #4ade80; }
+    .rank-badge { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; border: 1px solid var(--gold-light); }
+    .rank-info { flex: 1 1 0; min-width: 0; }
+    .rank-title { font-weight: 700; font-size: 0.92rem; color: var(--gold-light); word-wrap: break-word; }
+    .rank-sub { font-size: 0.78rem; color: var(--text-muted); word-wrap: break-word; }
+    .rank-val { font-weight: 700; font-size: 0.85rem; color: #fff; white-space: nowrap; flex-shrink: 0; }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 </head>
@@ -1196,6 +1210,7 @@
     <button class="btn btn-primary brand-btn" id="btn-new-top" data-i18n="newGame">Новая игра</button>
     <div class="top-controls">
       <button class="btn" id="btn-cosmetics" data-i18n="cosmetics">Косметика</button>
+        <button class="btn" id="btn-ranks" data-i18n="ranksBtn">Достижения</button>
       <button class="btn" id="btn-menu" data-i18n="menu">Меню</button>
     </div>
   </header>
@@ -1414,6 +1429,7 @@
         <button class="btn btn-primary" id="btn-mode-ai" data-i18n="playAI">Игра с ИИ</button>
         <button class="btn" id="btn-mode-pvp" data-i18n="playPVP">Игра на двоих</button>
         <button class="btn" id="btn-mode-online" data-i18n="playOnline">Игра онлайн</button>
+        <button class="btn" id="btn-ranks" data-i18n="ranksBtn">Достижения</button>
         <button class="btn" id="btn-rules" data-i18n="rules">Правила</button>
         <button class="btn btn-resume" id="btn-resume" data-i18n="resume" hidden>Вернуться к партии</button>
       </div>
@@ -1463,6 +1479,23 @@
     </div>
   </div>
 
+  <!-- Лиги и достижения -->
+  <div class="modal-overlay hidden" id="modal-ranks" role="dialog" aria-modal="true" aria-labelledby="ranks-title">
+    <div class="modal-card" style="max-width: 460px;">
+      <h2 id="ranks-title" data-i18n="ranksBtn">Лиги и Достижения</h2>
+      <div id="ranks-summary" style="margin-bottom:10px; font-size:0.88rem; color:var(--gold-light);"></div>
+      <div class="ranks-tabs">
+        <button class="ranks-tab active" data-rtab="leagues" data-i18n="tabLeagues">Лиги</button>
+        <button class="ranks-tab" data-rtab="ach" data-i18n="tabAch">Достижения</button>
+        <button class="ranks-tab" data-rtab="top" data-i18n="tabTop">Топ лиги</button>
+      </div>
+      <div class="ranks-list" id="ranks-list"></div>
+      <div style="margin-top: 14px;">
+        <button class="btn" id="btn-close-ranks" data-i18n="close">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Победа -->
   <div class="modal-overlay hidden" id="modal-win">
     <div class="modal-card">
@@ -1476,7 +1509,7 @@
     /** Локализация: обе разновидности нард, RU / EN. */
     const I18N = {
       ru: {
-        title: 'Нарды: Классик', menu: 'Меню', cosmetics: 'Косметика', cosmeticsTitle: 'Косметика',
+        title: 'Нарды: Классик', menu: 'Меню', cosmetics: 'Косметика', ranksBtn: 'Достижения', tabLeagues: 'Лиги', tabAch: 'Достижения', tabTop: 'Топ лиги', cosmeticsTitle: 'Косметика',
         boardThemesTitle: 'Оформление полотна', checkerStylesTitle: 'Стиль шашек',
         whitePlayer: 'Белые (Игрок 1)', blackPlayerAI: 'Черные (ИИ)', blackPlayerP2: 'Черные (Игрок 2)',
         borneOff: 'Снято', roll: 'Бросить кубики', endTurn: 'Завершить ход',
@@ -1517,7 +1550,7 @@
         ]
       },
       en: {
-        title: 'Backgammon Classic', menu: 'Menu', cosmetics: 'Cosmetics', cosmeticsTitle: 'Cosmetics',
+        title: 'Backgammon Classic', menu: 'Menu', cosmetics: 'Cosmetics', ranksBtn: 'Achievements', tabLeagues: 'Leagues', tabAch: 'Achievements', tabTop: 'Top League', cosmeticsTitle: 'Cosmetics',
         boardThemesTitle: 'Board Themes', checkerStylesTitle: 'Checker Style',
         whitePlayer: 'White (Player 1)', blackPlayerAI: 'Black (AI)', blackPlayerP2: 'Black (Player 2)',
         borneOff: 'Borne off', roll: 'Roll Dice', endTurn: 'End Turn', undo: 'Undo Move', newGame: 'New Game',
@@ -2120,7 +2153,7 @@
         const text = dict[el.dataset.i18n];
         if (typeof text === 'string') el.textContent = text;
       });
-      if (game.mode === 'online') { const nw = byId('name-white'); const nb = byId('name-black'); const myL = `${getPlayerName()} (★${myRating})`; const opL = `${onlineOpponentName} (★${onlineOpponentRating})`; if (nw) nw.textContent = myOnlineColor === 'white' ? myL : opL; if (nb) nb.textContent = myOnlineColor === 'black' ? myL : opL; } else { els.nameBlack.textContent = game.mode === 'ai' ? dict.blackPlayerAI : dict.blackPlayerP2; }
+      if (game.mode === 'online') { const nw = byId('name-white'); const nb = byId('name-black'); const myLg = typeof getLeague === 'function' ? getLeague(myRating).icon + ' ' : ''; const opLg = typeof getLeague === 'function' ? getLeague(onlineOpponentRating).icon + ' ' : ''; const myL = `${myLg}${getPlayerName()} (★${myRating})`; const opL = `${opLg}${onlineOpponentName} (★${onlineOpponentRating})`; if (nw) nw.textContent = myOnlineColor === 'white' ? myL : opL; if (nb) nb.textContent = myOnlineColor === 'black' ? myL : opL; } else { els.nameBlack.textContent = game.mode === 'ai' ? dict.blackPlayerAI : dict.blackPlayerP2; }
       if (els.btnLang) {
         els.btnLang.textContent = lang === 'ru' ? 'EN' : 'RU';
         els.btnLang.setAttribute('aria-label', dict.languageLabel);
@@ -2281,7 +2314,7 @@
       els.offBlack.textContent = game.borneOff.black;
       els.cardWhite.classList.toggle('active', hasStarted && game.currentPlayer === 'white');
       els.cardBlack.classList.toggle('active', hasStarted && game.currentPlayer === 'black');
-      if (game.mode === 'online') { const nw = byId('name-white'); const nb = byId('name-black'); const myL = `${getPlayerName()} (★${myRating})`; const opL = `${onlineOpponentName} (★${onlineOpponentRating})`; if (nw) nw.textContent = myOnlineColor === 'white' ? myL : opL; if (nb) nb.textContent = myOnlineColor === 'black' ? myL : opL; } else { els.nameBlack.textContent = game.mode === 'ai' ? dict.blackPlayerAI : dict.blackPlayerP2; }
+      if (game.mode === 'online') { const nw = byId('name-white'); const nb = byId('name-black'); const myLg = typeof getLeague === 'function' ? getLeague(myRating).icon + ' ' : ''; const opLg = typeof getLeague === 'function' ? getLeague(onlineOpponentRating).icon + ' ' : ''; const myL = `${myLg}${getPlayerName()} (★${myRating})`; const opL = `${opLg}${onlineOpponentName} (★${onlineOpponentRating})`; if (nw) nw.textContent = myOnlineColor === 'white' ? myL : opL; if (nb) nb.textContent = myOnlineColor === 'black' ? myL : opL; } else { els.nameBlack.textContent = game.mode === 'ai' ? dict.blackPlayerAI : dict.blackPlayerP2; }
       els.btnRoll.hidden = game.hasRolled && human && !game.winner;
       els.btnRoll.disabled = !hasStarted || game.hasRolled || !human || !!game.winner || isAnimating;
       els.btnEnd.hidden = !game.hasRolled || !human || !!game.winner;
@@ -2503,11 +2536,16 @@
 
     function showWinModal() {
       playSound('win');
-      if (game.mode === 'online') {
-        if (game.winner === myOnlineColor) myRating += 25;
-        else myRating = Math.max(100, myRating - 15);
+      if ((game.mode === 'ai' && game.winner === 'white') || (game.mode === 'online' && game.winner === myOnlineColor)) {
+        totalWins += 1;
+        try { localStorage.setItem('nardy_wins', String(totalWins)); } catch (e) {}
+      }
+      if (game.mode === 'online' || game.mode === 'ai') {
+        const won = (game.mode === 'online' && game.winner === myOnlineColor) || (game.mode === 'ai' && game.winner === 'white');
+        if (won) myRating += 10;
+        else myRating = Math.max(100, myRating - 10);
         try { localStorage.setItem('nardy_player_rating', String(myRating)); } catch (e) {}
-        ratingBadge.textContent = `★ ${myRating}`;
+        if (ratingBadge) ratingBadge.textContent = `★ ${myRating}`;
       }
       updateWinText();
       els.modalWin.classList.remove('hidden');
@@ -3287,8 +3325,92 @@
       if (!code) return;
       connectWS(() => ws.send(JSON.stringify({ type: 'join_room', code, name: getPlayerName(), rating: myRating })));
     });
+
+    // Система лиг, рангов и достижений
+    let totalWins = 0;
+    try { totalWins = parseInt(localStorage.getItem('nardy_wins') || '0', 10) || 0; } catch (e) {}
+
+    const LEAGUES = [
+      { id: 'bronze', min: 0, max: 1099, ru: 'Бронзовая лига', en: 'Bronze League', icon: '🥉', bg: '#5c3a21' },
+      { id: 'silver', min: 1100, max: 1299, ru: 'Серебряная лига', en: 'Silver League', icon: '🥈', bg: '#4a5568' },
+      { id: 'ruby', min: 1300, max: 1599, ru: 'Рубиновая лига', en: 'Ruby League', icon: '♦️', bg: '#7f1d1d' },
+      { id: 'master', min: 1600, max: 1899, ru: 'Мастер (Сапфир)', en: 'Master (Sapphire)', icon: '💠', bg: '#1e3a8a' },
+      { id: 'legend', min: 1900, max: 99999, ru: 'Легенда (Изумруд)', en: 'Legend (Emerald)', icon: '👑', bg: '#064e3b' }
+    ];
+    const ACHIEVEMENTS = [
+      { req: 1, ru: 'Первая победа', en: 'First Victory', icon: '🎲' },
+      { req: 5, ru: 'Любитель', en: 'Amateur', icon: '⭐' },
+      { req: 15, ru: 'Игрок', en: 'Player', icon: '🏅' },
+      { req: 50, ru: 'Спец', en: 'Specialist', icon: '🏆' },
+      { req: 150, ru: 'Профи', en: 'Pro', icon: '💎' },
+      { req: 300, ru: 'Мастер', en: 'Master', icon: '👑' }
+    ];
+
+    function getLeague(r) {
+      return LEAGUES.find(l => r >= l.min && r <= l.max) || LEAGUES[0];
+    }
+
+    let currentRTab = 'leagues';
+    function renderRanksModal() {
+      const list = byId('ranks-list');
+      const sum = byId('ranks-summary');
+      const curL = getLeague(myRating);
+      sum.textContent = (lang === 'ru' ? 'Ваш ранг: ' : 'Your rank: ') + (lang === 'ru' ? curL.ru : curL.en) + ` · ★ ${myRating} · ` + (lang === 'ru' ? `Побед: ${totalWins}` : `Wins: ${totalWins}`);
+      list.innerHTML = '';
+      if (currentRTab === 'leagues') {
+        LEAGUES.forEach(l => {
+          const isCur = l.id === curL.id;
+          const div = document.createElement('div');
+          div.className = 'rank-item' + (isCur ? ' current' : '');
+          div.innerHTML = `<div class="rank-badge" style="background:${l.bg}">${l.icon}</div><div class="rank-info"><div class="rank-title">${lang === 'ru' ? l.ru : l.en}</div><div class="rank-sub">${l.max > 9000 ? `${l.min}+ ★` : `${l.min} – ${l.max} ★`}</div></div><div class="rank-val">${isCur ? (lang === 'ru' ? 'Вы здесь' : 'Current') : ''}</div>`;
+          list.appendChild(div);
+        });
+      } else if (currentRTab === 'ach') {
+        ACHIEVEMENTS.forEach(a => {
+          const done = totalWins >= a.req;
+          const div = document.createElement('div');
+          div.className = 'rank-item' + (done ? ' done' : '');
+          div.innerHTML = `<div class="rank-badge" style="background:${done ? '#064e3b' : '#1f1710'}">${a.icon}</div><div class="rank-info"><div class="rank-title">${lang === 'ru' ? a.ru : a.en}</div><div class="rank-sub">${lang === 'ru' ? `Побед: ${Math.min(totalWins, a.req)} / ${a.req}` : `Wins: ${Math.min(totalWins, a.req)} / ${a.req}`}</div></div><div class="rank-val">${done ? '✓' : '🔒'}</div>`;
+          list.appendChild(div);
+        });
+      } else {
+        const myName = getPlayerName();
+        const top = [
+          { name: 'Рома', rating: 1940 },
+          { name: 'Дима', rating: 1680 },
+          { name: 'Алекс', rating: 1420 },
+          { name: myName, rating: myRating, isMe: true },
+          { name: 'Игрок', rating: 950 }
+        ].sort((a, b) => b.rating - a.rating);
+        top.forEach((p, idx) => {
+          const lg = getLeague(p.rating);
+          const div = document.createElement('div');
+          div.className = 'rank-item' + (p.isMe ? ' current' : '');
+          div.innerHTML = `<div class="rank-badge" style="background:${lg.bg}">${idx + 1}</div><div class="rank-info"><div class="rank-title">${p.name}</div><div class="rank-sub">${lang === 'ru' ? lg.ru : lg.en}</div></div><div class="rank-val">★ ${p.rating}</div>`;
+          list.appendChild(div);
+        });
+      }
+    }
+
+    document.querySelectorAll('#btn-ranks').forEach(b => b.addEventListener('click', () => {
+      els.modalMenu.classList.add('hidden');
+      renderRanksModal();
+      byId('modal-ranks').classList.remove('hidden');
+    }));
+    byId('btn-close-ranks').addEventListener('click', () => {
+      byId('modal-ranks').classList.add('hidden');
+      els.modalMenu.classList.remove('hidden');
+    });
+    document.querySelectorAll('.ranks-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.ranks-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentRTab = btn.dataset.rtab;
+        renderRanksModal();
+      });
+    });
   </script>
 
   <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js" async onload="if(window.vkBridge)vkBridge.send('VKWebAppInit').catch(function(){});"></script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a602730e1b08f2bb',t:'MTc5NTYyODU0MQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a602730e1b08f2bb',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
