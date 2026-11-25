@@ -1570,7 +1570,7 @@
      */
     class BackgammonGame {
       constructor(mode = 'ai', variant = 'short') {
-        this.mode = mode === 'pvp' ? 'pvp' : 'ai';
+        this.mode = (mode === 'pvp' || mode === 'online') ? mode : 'ai';
         this.variant = variant === 'long' ? 'long' : 'short';
         this.reset();
       }
@@ -2119,7 +2119,7 @@
         const text = dict[el.dataset.i18n];
         if (typeof text === 'string') el.textContent = text;
       });
-      if (game.mode !== 'online') els.nameBlack.textContent = game.mode === 'ai' ? dict.blackPlayerAI : dict.blackPlayerP2;
+      if (game.mode === 'online') { const nw = byId('name-white'); const nb = byId('name-black'); const myL = `${getPlayerName()} (★${myRating})`; const opL = `${onlineOpponentName} (★${onlineOpponentRating})`; if (nw) nw.textContent = myOnlineColor === 'white' ? myL : opL; if (nb) nb.textContent = myOnlineColor === 'black' ? myL : opL; } else { els.nameBlack.textContent = game.mode === 'ai' ? dict.blackPlayerAI : dict.blackPlayerP2; }
       if (els.btnLang) {
         els.btnLang.textContent = lang === 'ru' ? 'EN' : 'RU';
         els.btnLang.setAttribute('aria-label', dict.languageLabel);
@@ -2144,7 +2144,7 @@
       const dict = I18N[lang];
       if (!hasStarted) els.status.textContent = dict.chooseMode;
       else if (game.winner) els.status.textContent = game.winner === 'white' ? dict.whiteWins : dict.blackWins;
-      else if (!isHumanTurn()) els.status.textContent = dict.aiThinking;
+      else if (!isHumanTurn()) els.status.textContent = game.mode === 'online' ? (lang === 'ru' ? 'Ход соперника...' : 'Opponent turn...') : dict.aiThinking;
       else if (!game.hasRolled) els.status.textContent = dict.rollPrompt;
       else if (legalMoves.length === 0) els.status.textContent = game.history.length ? dict.turnComplete : dict.noMoves;
       else els.status.textContent = selectedSource === null ? dict.movePrompt : dict.targetPrompt;
@@ -2280,7 +2280,7 @@
       els.offBlack.textContent = game.borneOff.black;
       els.cardWhite.classList.toggle('active', hasStarted && game.currentPlayer === 'white');
       els.cardBlack.classList.toggle('active', hasStarted && game.currentPlayer === 'black');
-      if (game.mode !== 'online') els.nameBlack.textContent = game.mode === 'ai' ? dict.blackPlayerAI : dict.blackPlayerP2;
+      if (game.mode === 'online') { const nw = byId('name-white'); const nb = byId('name-black'); const myL = `${getPlayerName()} (★${myRating})`; const opL = `${onlineOpponentName} (★${onlineOpponentRating})`; if (nw) nw.textContent = myOnlineColor === 'white' ? myL : opL; if (nb) nb.textContent = myOnlineColor === 'black' ? myL : opL; } else { els.nameBlack.textContent = game.mode === 'ai' ? dict.blackPlayerAI : dict.blackPlayerP2; }
       els.btnRoll.hidden = game.hasRolled && human && !game.winner;
       els.btnRoll.disabled = !hasStarted || game.hasRolled || !human || !!game.winner || isAnimating;
       els.btnEnd.hidden = !game.hasRolled || !human || !!game.winner;
@@ -2317,6 +2317,7 @@
     }
 
     function renderDice(animate = false) {
+      if (!game.hasRolled && els.diceArea) { els.diceArea.innerHTML = ''; return; }
       els.diceArea.replaceChildren();
       if (!game.hasRolled || !game.dice.length) return;
       const doubles = game.dice[0] === game.dice[1];
@@ -2469,10 +2470,11 @@
       if (isAnimating || !hasStarted || !game.endTurn()) return;
       selectedSource = null;
       render();
-      if (!isHumanTurn()) runAITurn();
+      if (game.mode === 'ai' && !isHumanTurn()) runAITurn();
     }
 
     function runAITurn() {
+      if (game.mode !== 'ai') return;
       if (game.winner || isHumanTurn() || game.hasRolled) return;
       later(() => {
         if (game.winner || isHumanTurn() || game.hasRolled) return;
@@ -3244,5 +3246,5 @@
   </script>
 
   <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js" async onload="if(window.vkBridge)vkBridge.send('VKWebAppInit').catch(function(){});"></script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a6010f300c54fff2',t:'MTc5NTYxMzk2NA=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a6010f300c54fff2',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a601b494ac198850',t:'MTc5NTYyMDczOQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a601b494ac198850',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
