@@ -448,7 +448,7 @@
       transform: scaleY(-1);
     }
 
-    /* Подсветка доступных ходов — укороченный столб, плавно растворяющийся к концу */
+    /* Подсветка доступных ходов — укороченный столб в зелёных тонах, плавно растворяющийся к концу */
     .point.valid-target::after {
       content: '';
       position: absolute;
@@ -456,21 +456,21 @@
       right: 2px;
       height: 62%;
       border-radius: 8px;
-      border: 2px solid var(--gold-light);
-      box-shadow: inset 0 0 12px rgba(255, 226, 128, 0.28);
+      border: 2px solid #4ade80;
+      box-shadow: inset 0 0 12px rgba(74, 222, 128, 0.32);
       z-index: 2;
       pointer-events: none;
       animation: target-cell-pulse 1.2s infinite ease-in-out;
     }
     .row.top .point.valid-target::after {
       top: 2px;
-      background: linear-gradient(180deg, rgba(255, 224, 112, 0.38) 0%, rgba(212, 175, 55, 0.14) 55%, rgba(212, 175, 55, 0) 100%);
+      background: linear-gradient(180deg, rgba(74, 222, 128, 0.42) 0%, rgba(34, 197, 94, 0.16) 55%, rgba(34, 197, 94, 0) 100%);
       -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 45%, transparent 100%);
       mask-image: linear-gradient(180deg, #000 0%, #000 45%, transparent 100%);
     }
     .row.bottom .point.valid-target::after {
       bottom: 2px;
-      background: linear-gradient(0deg, rgba(255, 224, 112, 0.38) 0%, rgba(212, 175, 55, 0.14) 55%, rgba(212, 175, 55, 0) 100%);
+      background: linear-gradient(0deg, rgba(74, 222, 128, 0.42) 0%, rgba(34, 197, 94, 0.16) 55%, rgba(34, 197, 94, 0) 100%);
       -webkit-mask-image: linear-gradient(0deg, #000 0%, #000 45%, transparent 100%);
       mask-image: linear-gradient(0deg, #000 0%, #000 45%, transparent 100%);
     }
@@ -1172,6 +1172,19 @@
         max-width: 68px;
       }
     }
+    /* Адаптация стилей шашек только на планшетах: по 2 в ряд и по центру */
+    @media (min-width: 600px) and (max-width: 1024px) {
+      #checker-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        justify-content: center;
+      }
+      #checker-grid .theme-card {
+        width: 100%;
+        margin: 0 auto;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1399,6 +1412,7 @@
       <div class="menu-buttons">
         <button class="btn btn-primary" id="btn-mode-ai" data-i18n="playAI">Игра с ИИ</button>
         <button class="btn" id="btn-mode-pvp" data-i18n="playPVP">Игра на двоих</button>
+        <button class="btn" id="btn-mode-online" data-i18n="playOnline">Игра онлайн</button>
         <button class="btn" id="btn-rules" data-i18n="rules">Правила</button>
         <button class="btn btn-resume" id="btn-resume" data-i18n="resume" hidden>Вернуться к партии</button>
       </div>
@@ -1426,6 +1440,24 @@
     </div>
   </div>
 
+  <!-- Онлайн-лобби -->
+  <div class="modal-overlay hidden" id="modal-online" role="dialog" aria-modal="true" aria-labelledby="online-title">
+    <div class="modal-card">
+      <h2 id="online-title" data-i18n="playOnline">Игра онлайн</h2>
+      <p id="online-status" style="min-height: 22px; color: var(--gold-light);"></p>
+      <div style="display:flex; flex-direction:column; gap:10px; margin:14px 0;">
+        <input id="online-server-url" type="hidden" value="wss://nardy-server-3mqb.onrender.com" />
+        <button class="btn btn-primary" id="btn-find-match" data-i18n="findMatch">Найти соперника</button>
+        <button class="btn" id="btn-create-room" data-i18n="createRoom">Создать комнату</button>
+        <div style="display:flex; gap:8px;">
+          <input id="online-room-code" type="text" maxlength="6" placeholder="Код / Code" style="flex:1; padding:9px 12px; border-radius:6px; border:1px solid var(--gold-dark); background:#120d08; color:var(--text-main); text-transform:uppercase; font-family:inherit;" />
+          <button class="btn" id="btn-join-room" data-i18n="joinRoom">Войти</button>
+        </div>
+      </div>
+      <button class="btn" id="btn-close-online" data-i18n="close">Закрыть</button>
+    </div>
+  </div>
+
   <!-- Победа -->
   <div class="modal-overlay hidden" id="modal-win">
     <div class="modal-card">
@@ -1449,7 +1481,7 @@
         shortCaption: 'Взятие шашек · игра с баром', longCaption: 'Общее направление · без взятия',
         shortDescription: 'Классическая расстановка. Сбивайте блоты и возвращайте шашки с бара.',
         longDescription: 'Все 15 шашек начинают на голове. Пройдите круг к своему дому — без взятия и бара.',
-        newVariant: 'Новое', diffEasy: 'Лёгкий', diffMedium: 'Средний', diffHard: 'Сложный', playAI: 'Игра с ИИ', playPVP: 'Игра на двоих',
+        newVariant: 'Новое', diffEasy: 'Лёгкий', diffMedium: 'Средний', diffHard: 'Сложный', playAI: 'Игра с ИИ', playPVP: 'Игра на двоих', playOnline: 'Игра онлайн', findMatch: 'Найти соперника', createRoom: 'Создать комнату', joinRoom: 'Войти',
         rules: 'Правила', rulesTitleShort: 'Правила коротких нард', rulesTitleLong: 'Правила длинных нард',
         close: 'Закрыть', resume: 'Вернуться к партии', chooseMode: 'Выберите вид и режим игры',
         rollPrompt: 'Бросьте кубики', movePrompt: 'Ваш ход — выберите шашку', targetPrompt: 'Выберите подсвеченный пункт',
@@ -1489,7 +1521,7 @@
         shortCaption: 'Hit blots · re-enter from the bar', longCaption: 'One direction · no hitting',
         shortDescription: 'The classic setup. Hit exposed checkers and re-enter your own from the bar.',
         longDescription: 'All 15 checkers start on the head. Race to your home board, with no hitting or bar.',
-        newVariant: 'New', diffEasy: 'Easy', diffMedium: 'Medium', diffHard: 'Hard', playAI: 'Play vs AI', playPVP: '2 Players (Local)',
+        newVariant: 'New', diffEasy: 'Easy', diffMedium: 'Medium', diffHard: 'Hard', playAI: 'Play vs AI', playPVP: '2 Players (Local)', playOnline: 'Play Online', findMatch: 'Find Opponent', createRoom: 'Create Room', joinRoom: 'Join',
         rules: 'Rules', rulesTitleShort: 'Backgammon Rules', rulesTitleLong: 'Long Nardy Rules',
         close: 'Close', resume: 'Return to Game', chooseMode: 'Choose a game and opponent',
         rollPrompt: 'Roll the dice', movePrompt: 'Your turn — select a checker', targetPrompt: 'Choose a highlighted point',
@@ -1521,8 +1553,8 @@
     };
 
     /* Выбранные оформления (объявлены заранее, т.к. используются в applyLanguage) */
-    let currentTheme = 'spider';
-    let currentCheckerSkin = 'classic';
+    let currentTheme = (function(){ try { return localStorage.getItem('nardy_board_theme') || 'spider'; } catch(e) { return 'spider'; } })();
+    let currentCheckerSkin = (function(){ try { return localStorage.getItem('nardy_checker_skin') || 'classic'; } catch(e) { return 'classic'; } })();
     let cosmeticsReady = false;
 
     /**
@@ -2379,6 +2411,8 @@
       render();
       animateMove(move.from, move.to, color, () => {
         if (!game.makeMove(move)) { render(); return; }
+        playSound('move');
+        if (game.mode === 'online' && isHumanTurn()) sendOnline({ type: 'move', move });
         render();
         if (game.winner) { showWinModal(); return; }
         if (onDone) { onDone(); return; }
@@ -2426,6 +2460,7 @@
     }
 
     function finishTurn() {
+      if (game.mode === 'online' && isHumanTurn()) sendOnline({ type: 'endTurn' });
       if (isAnimating || !hasStarted || !game.endTurn()) return;
       selectedSource = null;
       render();
@@ -2437,6 +2472,7 @@
       later(() => {
         if (game.winner || isHumanTurn() || game.hasRolled) return;
         game.rollDice();
+      playSound('dice');
         render();
         renderDice(true);
         later(runAIMoveStep, 600);
@@ -2457,6 +2493,7 @@
     }
 
     function showWinModal() {
+      playSound('win');
       updateWinText();
       els.modalWin.classList.remove('hidden');
       byId('btn-win-new').focus();
@@ -2534,8 +2571,10 @@
       });
     }
     els.btnRoll.addEventListener('click', () => {
+      setTimeout(() => { if (game.mode === 'online' && game.hasRolled) sendOnline({ type: 'roll', dice: game.dice }); }, 0);
       if (!hasStarted || isAnimating || game.hasRolled || game.winner || !isHumanTurn() || overlayOpen()) return;
       game.rollDice();
+      playSound('dice');
       selectedSource = null;
       render();
       renderDice(true);
@@ -2543,7 +2582,8 @@
     els.btnEnd.addEventListener('click', () => { if (isHumanTurn() && !overlayOpen()) finishTurn(); });
     els.btnUndo.addEventListener('click', () => {
       if (isAnimating || !isHumanTurn() || overlayOpen()) return;
-      if (game.undo()) { selectedSource = null; render(); }
+      if (game.undo()) {
+        if (game.mode === 'online') sendOnline({ type: 'undo' }); selectedSource = null; render(); }
     });
     els.barWhite.addEventListener('click', () => onBarClick('white'));
     els.barBlack.addEventListener('click', () => onBarClick('black'));
@@ -2836,6 +2876,7 @@
     function applyBoardTheme(key) {
       const theme = BOARD_THEMES[key] || BOARD_THEMES.spider;
       currentTheme = key;
+      try { localStorage.setItem('nardy_board_theme', key); } catch(e) {}
       document.querySelectorAll('.board-half').forEach(half => {
         half.style.background = theme.bg;
         half.dataset.theme = key;
@@ -2925,6 +2966,7 @@
     function applyCheckerSkin(key) {
       const skin = CHECKER_SKINS[key] || CHECKER_SKINS.classic;
       currentCheckerSkin = key;
+      try { localStorage.setItem('nardy_checker_skin', key); } catch(e) {}
       document.body.dataset.checkers = key;
       checkerSkinStyle.textContent = `
         body[data-checkers="${key}"] .checker.white,
@@ -2981,10 +3023,183 @@
       });
     });
 
+
+    // Реалистичные звуковые эффекты (Web Audio API, без внешних файлов)
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    function getAudioCtx() {
+      if (!AudioCtx) return null;
+      if (!audioCtx) audioCtx = new AudioCtx();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+    function playWoodTap(ctx, time, pitch, vol) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(pitch, time);
+      osc.frequency.exponentialRampToValueAtTime(pitch * 0.35, time + 0.045);
+      gain.gain.setValueAtTime(vol, time);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(time);
+      osc.stop(time + 0.055);
+    }
+    function playNoiseClick(ctx, time, freq, vol, dur) {
+      const bufSize = Math.floor(ctx.sampleRate * dur);
+      const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.35));
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = freq;
+      filter.Q.value = 1.8;
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(vol, time);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
+      src.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+      src.start(time);
+    }
+    function playSound(type) {
+      try {
+        const ctx = getAudioCtx();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+        if (type === 'move') {
+          playWoodTap(ctx, now, 280, 0.38);
+          playNoiseClick(ctx, now, 1100, 0.25, 0.035);
+        } else if (type === 'dice') {
+          const hits = [0, 0.055, 0.115, 0.17, 0.24, 0.31];
+          hits.forEach((delay, idx) => {
+            const pitch = 240 + (idx % 3) * 55;
+            const vol = Math.max(0.08, 0.28 - idx * 0.035);
+            playWoodTap(ctx, now + delay, pitch, vol);
+            playNoiseClick(ctx, now + delay, 1400 + idx * 120, vol * 0.8, 0.03);
+          });
+        } else if (type === 'win') {
+          [523.25, 659.25, 783.99].forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + idx * 0.11);
+            gain.gain.setValueAtTime(0.22, now + idx * 0.11);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.11 + 0.35);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + idx * 0.11);
+            osc.stop(now + idx * 0.11 + 0.36);
+          });
+        }
+      } catch (e) {}
+    }
+
     applyBoardTheme(currentTheme);
     applyCheckerSkin(currentCheckerSkin);
     cosmeticsReady = true;
+
+    // Онлайн-мультиплеер (WebSocket)
+    let ws = null;
+    const modalOnline = byId('modal-online');
+    const onlineStatus = byId('online-status');
+    const serverInput = byId('online-server-url');
+    const roomInput = byId('online-room-code');
+
+    try {
+      serverInput.value = localStorage.getItem('nardy_ws_url') || 'wss://nardy-server-3mqb.onrender.com';
+    } catch (e) {
+      serverInput.value = 'wss://nardy-server-3mqb.onrender.com';
+    }
+
+    function sendOnline(payload) {
+      if (game.mode === 'online' && ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify(payload));
+      }
+    }
+
+    function connectWS(onOpenAction) {
+      const url = serverInput.value.trim();
+      if (!url) return;
+      try { localStorage.setItem('nardy_ws_url', url); } catch (e) {}
+      if (ws) { try { ws.close(); } catch (e) {} }
+      onlineStatus.textContent = lang === 'ru' ? 'Подключение к серверу...' : 'Connecting to server...';
+      ws = new WebSocket(url);
+      ws.onopen = () => {
+        if (onOpenAction) onOpenAction();
+      };
+      ws.onerror = () => {
+        onlineStatus.textContent = lang === 'ru' ? 'Ошибка подключения к серверу' : 'Connection error';
+      };
+      ws.onmessage = (ev) => {
+        let msg;
+        try { msg = JSON.parse(ev.data); } catch { return; }
+        if (msg.type === 'waiting') {
+          onlineStatus.textContent = lang === 'ru' ? 'Поиск соперника...' : 'Searching for opponent...';
+        } else if (msg.type === 'room_created') {
+          onlineStatus.textContent = (lang === 'ru' ? 'Код комнаты: ' : 'Room code: ') + msg.code;
+        } else if (msg.type === 'error') {
+          onlineStatus.textContent = msg.message || 'Error';
+        } else if (msg.type === 'matched') {
+          myOnlineColor = msg.color;
+          modalOnline.classList.add('hidden');
+          startNewGame('online', msg.variant || selectedVariant);
+          els.status.textContent = lang === 'ru'
+            ? (myOnlineColor === 'white' ? 'Вы играете Белыми' : 'Вы играете Черными')
+            : (myOnlineColor === 'white' ? 'You play White' : 'You play Black');
+        } else if (msg.type === 'roll') {
+          game.dice = msg.dice;
+          game.remainingDice = msg.dice[0] === msg.dice[1] ? [msg.dice[0], msg.dice[0], msg.dice[0], msg.dice[0]] : [...msg.dice];
+          game.hasRolled = true;
+          game.history = [];
+          playSound('dice');
+          render();
+          renderDice(true);
+        } else if (msg.type === 'move') {
+          const color = game.currentPlayer;
+          animateMove(msg.move.from, msg.move.to, color, () => {
+            game.makeMove(msg.move);
+            playSound('move');
+            render();
+            if (game.winner) showWinModal();
+          });
+        } else if (msg.type === 'undo') {
+          game.undo();
+          render();
+        } else if (msg.type === 'endTurn') {
+          game.endTurn();
+          render();
+        } else if (msg.type === 'opponent_left') {
+          els.status.textContent = lang === 'ru' ? 'Соперник покинул игру' : 'Opponent left the game';
+        }
+      };
+    }
+
+    byId('btn-mode-online').addEventListener('click', () => {
+      els.modalMenu.classList.add('hidden');
+      onlineStatus.textContent = '';
+      modalOnline.classList.remove('hidden');
+    });
+    byId('btn-close-online').addEventListener('click', () => {
+      modalOnline.classList.add('hidden');
+      if (ws && game.mode !== 'online') { try { ws.close(); } catch (e) {} }
+    });
+    byId('btn-find-match').addEventListener('click', () => {
+      connectWS(() => ws.send(JSON.stringify({ type: 'find_match', variant: selectedVariant })));
+    });
+    byId('btn-create-room').addEventListener('click', () => {
+      connectWS(() => ws.send(JSON.stringify({ type: 'create_room', variant: selectedVariant })));
+    });
+    byId('btn-join-room').addEventListener('click', () => {
+      const code = roomInput.value.trim().toUpperCase();
+      if (!code) return;
+      connectWS(() => ws.send(JSON.stringify({ type: 'join_room', code })));
+    });
   </script>
+
   <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js" async onload="if(window.vkBridge)vkBridge.send('VKWebAppInit').catch(function(){});"></script>
 </body>
 </html>
