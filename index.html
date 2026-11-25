@@ -3186,8 +3186,10 @@
           startNewGame('online', msg.variant || selectedVariant);
           const myLabel = `${getPlayerName()} (★${myRating})`;
           const oppLabel = `${onlineOpponentName} (★${onlineOpponentRating})`;
-          els.nameWhite.textContent = myOnlineColor === 'white' ? myLabel : oppLabel;
-          els.nameBlack.textContent = myOnlineColor === 'black' ? myLabel : oppLabel;
+          const nw = els.nameWhite || byId('name-white');
+          const nb = els.nameBlack || byId('name-black');
+          if (nw) nw.textContent = myOnlineColor === 'white' ? myLabel : oppLabel;
+          if (nb) nb.textContent = myOnlineColor === 'black' ? myLabel : oppLabel;
           els.status.textContent = lang === 'ru'
             ? (myOnlineColor === 'white' ? 'Вы играете Белыми' : 'Вы играете Черными')
             : (myOnlineColor === 'white' ? 'You play White' : 'You play Black');
@@ -3242,5 +3244,5 @@
   </script>
 
   <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js" async onload="if(window.vkBridge)vkBridge.send('VKWebAppInit').catch(function(){});"></script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a6010786e9b4fff2',t:'MTc5NTYxMzY1MQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a6010786e9b4fff2',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a6010f300c54fff2',t:'MTc5NTYxMzk2NA=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a6010f300c54fff2',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
